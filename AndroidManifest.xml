@@ -53,7 +53,7 @@
             android:theme="@style/Theme.CastVideoOverlayYellow" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.firefly.sample.cast.refplayer.VideoBrowserActivity" />
+                android:value="tv.matchstick.sample.fling.refplayer.VideoBrowserActivity" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
