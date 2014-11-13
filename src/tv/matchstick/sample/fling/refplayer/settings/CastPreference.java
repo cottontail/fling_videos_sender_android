@@ -84,6 +84,7 @@ public class CastPreference extends PreferenceActivity
 
         mReceiverAddress = (EditTextPreference) findPreference("receiver_address");
         mReceiverAddress.setSummary(getReceiverAddress(this));
+        mReceiverAddress.setEnabled(false);
         mServerAddress = (EditTextPreference) findPreference("server_address");
         mServerAddress.setSummary(getServerAddress(this));
         
@@ -136,24 +137,24 @@ public class CastPreference extends PreferenceActivity
     public static String getReceiverAddress(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         String address = sharedPref.getString(RECEIVER_ADDRESS_KEY, "");
-        return (address.length() > 0) ? address : "http://fling.infthink.com/receiver/mediaplayer/index.html";
+        return (address.length() > 0) ? address : "http://openflint.github.io/flint-player/player.html";
     }
 
     public static void setReceiverAddress(Context context, String address) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         sharedPref.edit().putString(RECEIVER_ADDRESS_KEY, 
-                       (address.length() > 0) ? address : "http://fling.infthink.com/receiver/mediaplayer/index.html").commit();
+                       (address.length() > 0) ? address : "http://openflint.github.io/flint-player/player.html").commit();
     }
 
     public static String getServerAddress(Context context) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
         String address = sharedPref.getString(SERVER_ADDRESS_KEY, "");
-        return (address.length() > 0) ? address : "http://fling.infthink.com/droidream/samples/";
+        return (address.length() > 0) ? address : "http://fling.matchstick.tv/droidream/samples/";
     }
     
     public static void setServerAddress(Context context, String address) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        sharedPref.edit().putString(SERVER_ADDRESS_KEY, (address.length() > 0) ? address : "http://fling.infthink.com/droidream/samples/").commit();
+        sharedPref.edit().putString(SERVER_ADDRESS_KEY, (address.length() > 0) ? address : "http://fling.matchstick.tv/droidream/samples/").commit();
     }
 
     public static void setMode(Context context, String mode) {

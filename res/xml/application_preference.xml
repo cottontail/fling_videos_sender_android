@@ -31,16 +31,16 @@
     <PreferenceCategory android:title="ADDRESS SETTINGS">
         <EditTextPreference
             android:title="Receiver Address"
-            android:summary="http://fling.infthink.com/receiver/mediaplayer/index.html"
+            android:summary="http://openflint.github.io/flint-player/player.html"
             android:key="receiver_address"
-            android:defaultValue="http://fling.infthink.com/receiver/mediaplayer/index.html"
+            android:defaultValue="http://openflint.github.io/flint-player/player.html"
             android:dialogTitle="Receiver Address">
         </EditTextPreference>
         <EditTextPreference
             android:title="Server Address"
-            android:summary="http://fling.infthink.com/droidream/samples/"
+            android:summary="http://fling.matchstick.tv/droidream/samples/"
             android:key="server_address"
-            android:defaultValue="http://fling.infthink.com/droidream/samples/"
+            android:defaultValue="http://fling.matchstick.tv/droidream/samples/"
             android:dialogTitle="Server Address">
         </EditTextPreference>
     </PreferenceCategory>

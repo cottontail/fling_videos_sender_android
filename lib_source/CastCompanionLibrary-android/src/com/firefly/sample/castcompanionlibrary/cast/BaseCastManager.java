@@ -192,7 +192,7 @@ FlingManager.OnConnectionFailedListener, OnFailedListener {
                 MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
     }
     
-    protected String getAppId() {
+    protected String getAppUrl() {
 //        if (mSelectedCastDevice != null && mApplicationId.startsWith("app:?")) {
 //            if ("Chromecast".equals(mSelectedCastDevice.getModelName())) {
 //                return FlingMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID;
@@ -1041,7 +1041,7 @@ public void onCastAvailabilityChanged(boolean castPresent) {
             LOGD(TAG, "Attempting to join a previously interrupted session...");
             String sessionId = Utils.getStringFromPreference(mContext, PREFS_KEY_SESSION_ID);
             LOGD(TAG, "joinApplication() -> start");
-            Fling.FlingApi.joinApplication(mApiClient, getAppId()).setResultCallback(
+            Fling.FlingApi.joinApplication(mApiClient, getAppUrl()).setResultCallback(
                     new ResultCallback<Fling.ApplicationConnectionResult>() {
 
                         @Override
@@ -1060,7 +1060,7 @@ public void onCastAvailabilityChanged(boolean castPresent) {
             );
         } else {
             LOGD(TAG, "Launching app");
-            Fling.FlingApi.launchApplication(mApiClient, getAppId()).setResultCallback(
+            Fling.FlingApi.launchApplication(mApiClient, getAppUrl()).setResultCallback(
                     new ResultCallback<Fling.ApplicationConnectionResult>() {
 
                         @Override
