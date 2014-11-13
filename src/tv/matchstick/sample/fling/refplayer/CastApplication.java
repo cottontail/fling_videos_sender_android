@@ -45,7 +45,7 @@ public class CastApplication extends Application {
         mAppContext = getApplicationContext();
         // APPLICATION_ID = "E9C6F80E"; //Use chromecast registered id
         String app_url = CastPreference.getReceiverAddress(this);
-        APPLICATION_ID = "~browser";
+        APPLICATION_ID = "~flintplayer";
         Fling.FlingApi.setApplicationId(APPLICATION_ID);
         Utils.saveFloatToPreference(getApplicationContext(),
                 VideoCastManager.PREFS_KEY_VOLUME_INCREMENT, (float) VOLUME_INCREMENT);
