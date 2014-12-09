@@ -16,7 +16,7 @@
 
 package com.firefly.sample.castcompanionlibrary.cast;
 
-import tv.matchstick.fling.FlingDevice;
+import tv.matchstick.flint.FlintDevice;
 import android.support.v7.media.MediaRouter.RouteInfo;
 
 /**
@@ -31,7 +31,7 @@ public interface DeviceSelectionListener {
      *
      * @param device
      */
-    public void onDeviceSelected(FlingDevice device);
+    public void onDeviceSelected(FlintDevice device);
 
     /**
      * Called as soon as a non-default {@link RouteInfo} is discovered. The main usage for this is

@@ -61,21 +61,21 @@ import com.firefly.sample.castcompanionlibrary.R;
 
 import org.json.JSONObject;
 
-import tv.matchstick.fling.ApplicationMetadata;
-import tv.matchstick.fling.ConnectionResult;
-import tv.matchstick.fling.Fling;
-import tv.matchstick.fling.Fling.FlingOptions.Builder;
-import tv.matchstick.fling.Fling.MessageReceivedCallback;
-import tv.matchstick.fling.FlingDevice;
-import tv.matchstick.fling.FlingStatusCodes;
-import tv.matchstick.fling.MediaInfo;
-import tv.matchstick.fling.MediaMetadata;
-import tv.matchstick.fling.MediaStatus;
-import tv.matchstick.fling.RemoteMediaPlayer;
-import tv.matchstick.fling.RemoteMediaPlayer.MediaChannelResult;
-import tv.matchstick.fling.ResultCallback;
-import tv.matchstick.fling.Status;
-import tv.matchstick.fling.images.WebImage;
+import tv.matchstick.flint.ApplicationMetadata;
+import tv.matchstick.flint.ConnectionResult;
+import tv.matchstick.flint.Flint;
+import tv.matchstick.flint.Flint.FlintOptions.Builder;
+import tv.matchstick.flint.Flint.MessageReceivedCallback;
+import tv.matchstick.flint.FlintDevice;
+import tv.matchstick.flint.FlintStatusCodes;
+import tv.matchstick.flint.MediaInfo;
+import tv.matchstick.flint.MediaMetadata;
+import tv.matchstick.flint.MediaStatus;
+import tv.matchstick.flint.RemoteMediaPlayer;
+import tv.matchstick.flint.RemoteMediaPlayer.MediaChannelResult;
+import tv.matchstick.flint.ResultCallback;
+import tv.matchstick.flint.Status;
+import tv.matchstick.flint.images.WebImage;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -150,7 +150,7 @@ public class VideoCastManager extends BaseCastManager
     private Bitmap mVideoArtBitmap;
     private final ComponentName mMediaButtonReceiverComponent;
     private final String mDataNamespace;
-    private Fling.MessageReceivedCallback mDataChannel;
+    private Flint.MessageReceivedCallback mDataChannel;
     private Set<IVideoCastConsumer> mVideoConsumers;
     private IMediaAuthService mAuthService;
     private Handler mHandler;
@@ -615,7 +615,7 @@ public class VideoCastManager extends BaseCastManager
             checkRemoteMediaPlayerAvailable();
             return mRemoteMediaPlayer.getMediaStatus().getStreamVolume();
         } else {
-            return Fling.FlingApi.getVolume(mApiClient);
+            return Flint.FlintApi.getVolume(mApiClient);
         }
     }
 
@@ -652,7 +652,7 @@ public class VideoCastManager extends BaseCastManager
             );
         } else {
             try {
-                Fling.FlingApi.setVolume(mApiClient, volume);
+                Flint.FlintApi.setVolume(mApiClient, volume);
             } catch (IOException e) {
                 throw new CastException(e);
             } catch (IllegalStateException e) {
@@ -713,7 +713,7 @@ public class VideoCastManager extends BaseCastManager
             checkRemoteMediaPlayerAvailable();
             return mRemoteMediaPlayer.getMediaStatus().isMute();
         } else {
-            return Fling.FlingApi.isMute(mApiClient);
+            return Flint.FlintApi.isMute(mApiClient);
         }
     }
 
@@ -734,7 +734,7 @@ public class VideoCastManager extends BaseCastManager
             mRemoteMediaPlayer.setStreamMute(mApiClient, mute);
         } else {
             try {
-                Fling.FlingApi.setMute(mApiClient, mute);
+                Flint.FlintApi.setMute(mApiClient, mute);
             } catch (Exception e) {
                 LOGE(TAG, "Failed to set volume", e);
                 throw new CastException("Failed to set volume", e);
@@ -854,9 +854,9 @@ public class VideoCastManager extends BaseCastManager
             return;
         }
         try {
-            appStatus = Fling.FlingApi.getApplicationStatus(mApiClient);
+            appStatus = Flint.FlintApi.getApplicationStatus(mApiClient);
             LOGD(TAG, "onApplicationStatusChanged() reached: "
-                    + Fling.FlingApi.getApplicationStatus(mApiClient));
+                    + Flint.FlintApi.getApplicationStatus(mApiClient));
             synchronized (mVideoConsumers) {
                 for (IVideoCastConsumer consumer : mVideoConsumers) {
                     try {
@@ -982,7 +982,7 @@ public class VideoCastManager extends BaseCastManager
     public void onApplicationConnectionFailed(int errorCode) {
         LOGD(TAG, "onApplicationConnectionFailed() reached with errorCode: " + errorCode);
         if (mReconnectionStatus == ReconnectionStatus.IN_PROGRESS) {
-//            if (errorCode == FlingStatusCodes.APPLICATION_NOT_RUNNING) {
+//            if (errorCode == FlintStatusCodes.APPLICATION_NOT_RUNNING) {
                 // while trying to re-establish session, we
                 // found out that the app is not running so we need
                 // to disconnect
@@ -1003,12 +1003,12 @@ public class VideoCastManager extends BaseCastManager
             }
             if (showError) {
                 switch (errorCode) {
-                    case FlingStatusCodes.APPLICATION_NOT_FOUND:
+                    case FlintStatusCodes.APPLICATION_NOT_FOUND:
                         LOGD(TAG, "onApplicationConnectionFailed(): failed due to: " +
                                 "ERROR_APPLICATION_NOT_FOUND");
                         Utils.showErrorDialog(mContext, R.string.failed_to_find_app);
                         break;
-                    case FlingStatusCodes.TIMEOUT:
+                    case ConnectionResult.TIMEOUT:
                         LOGD(TAG, "onApplicationConnectionFailed(): failed due to: ERROR_TIMEOUT");
                         Utils.showErrorDialog(mContext, R.string.failed_app_launch_timeout);
                         break;
@@ -1338,7 +1338,7 @@ public class VideoCastManager extends BaseCastManager
         }
         try {
             LOGD(TAG, "Registering MediaChannel namespace");
-            Fling.FlingApi.setMessageReceivedCallbacks(mApiClient, mRemoteMediaPlayer.getNamespace(),
+            Flint.FlintApi.setMessageReceivedCallbacks(mApiClient, mRemoteMediaPlayer.getNamespace(),
                     mRemoteMediaPlayer);
         } catch (Exception e) {
             LOGE(TAG, "Failed to set up media channel", e);
@@ -1349,7 +1349,7 @@ public class VideoCastManager extends BaseCastManager
         if (null != mRemoteMediaPlayer && null != mApiClient) {
             try {
                 LOGD(TAG, "Registering MediaChannel namespace");
-                Fling.FlingApi.setMessageReceivedCallbacks(mApiClient,
+                Flint.FlintApi.setMessageReceivedCallbacks(mApiClient,
                         mRemoteMediaPlayer.getNamespace(), mRemoteMediaPlayer);
             } catch (IOException e) {
                 LOGE(TAG, "Failed to setup media channel", e);
@@ -1362,9 +1362,9 @@ public class VideoCastManager extends BaseCastManager
     private void detachMediaChannel() {
         LOGD(TAG, "trying to detach media channel");
         if (null != mRemoteMediaPlayer) {
-            if (null != mRemoteMediaPlayer && null != Fling.FlingApi) {
+            if (null != mRemoteMediaPlayer && null != Flint.FlintApi) {
                 try {
-                    Fling.FlingApi.removeMessageReceivedCallbacks(mApiClient,
+                    Flint.FlintApi.removeMessageReceivedCallbacks(mApiClient,
                             mRemoteMediaPlayer.getNamespace());
                 } catch (Exception e) {
                     LOGE(TAG, "Failed to detach media channel", e);
@@ -1423,7 +1423,7 @@ public class VideoCastManager extends BaseCastManager
         mDataChannel = new MessageReceivedCallback() {
 
             @Override
-            public void onMessageReceived(FlingDevice flingDevice, String namespace, String message) {
+            public void onMessageReceived(FlintDevice flingDevice, String namespace, String message) {
                 synchronized (mVideoConsumers) {
                     for (IVideoCastConsumer consumer : mVideoConsumers) {
                         try {
@@ -1436,7 +1436,7 @@ public class VideoCastManager extends BaseCastManager
             }
         };
         try {
-            Fling.FlingApi.setMessageReceivedCallbacks(mApiClient, mDataNamespace, mDataChannel);
+            Flint.FlintApi.setMessageReceivedCallbacks(mApiClient, mDataNamespace, mDataChannel);
         } catch (IOException e) {
             LOGE(TAG, "Failed to setup data channel", e);
         } catch (IllegalStateException e) {
@@ -1447,7 +1447,7 @@ public class VideoCastManager extends BaseCastManager
     private void reattachDataChannel() {
         if (!TextUtils.isEmpty(mDataNamespace) && null != mDataChannel && null != mApiClient) {
             try {
-                Fling.FlingApi.setMessageReceivedCallbacks(mApiClient, mDataNamespace, mDataChannel);
+                Flint.FlintApi.setMessageReceivedCallbacks(mApiClient, mDataNamespace, mDataChannel);
             } catch (IOException e) {
                 LOGE(TAG, "Failed to setup data channel", e);
             } catch (IllegalStateException e) {
@@ -1488,7 +1488,7 @@ public class VideoCastManager extends BaseCastManager
             throw new IllegalStateException("No Data Namespace is configured");
         }
         checkConnectivity();
-        Fling.FlingApi.sendMessage(mApiClient, mDataNamespace, message)
+        Flint.FlintApi.sendMessage(mApiClient, mDataNamespace, message)
                 .setResultCallback(new ResultCallback<Status>() {
 
                     @Override
@@ -1512,8 +1512,8 @@ public class VideoCastManager extends BaseCastManager
             return false;
         }
         try {
-            if (null != Fling.FlingApi && null != mApiClient) {
-                Fling.FlingApi.removeMessageReceivedCallbacks(mApiClient, mDataNamespace);
+            if (null != Flint.FlintApi && null != mApiClient) {
+                Flint.FlintApi.removeMessageReceivedCallbacks(mApiClient, mDataNamespace);
             }
             mDataChannel = null;
             Utils.saveStringToPreference(mContext, PREFS_KEY_CAST_CUSTOM_DATA_NAMESPACE, null);
@@ -1541,8 +1541,6 @@ public class VideoCastManager extends BaseCastManager
         }
         mState = mRemoteMediaPlayer.getMediaStatus().getPlayerState();
         mIdleReason = mRemoteMediaPlayer.getMediaStatus().getIdleReason();
-        android.util.Log.d("XXXXXXXXXXXXX", "mState = " + mState);
-        android.util.Log.d("XXXXXXXXXXXXX", "mIdleReason = " + mIdleReason);
         try {
             double volume = getVolume();
             boolean isMute = isMute();
@@ -1938,11 +1936,8 @@ public class VideoCastManager extends BaseCastManager
     }
 
     @Override
-    Builder getCastOptionBuilder(FlingDevice device) {
-        Builder builder = Fling.FlingOptions.builder(mSelectedCastDevice, new FlingListener());
-        if (isFeatureEnabled(FEATURE_DEBUGGING)) {
-            builder.setVerboseLoggingEnabled(true);
-        }
+    Builder getCastOptionBuilder(FlintDevice device) {
+        Builder builder = Flint.FlintOptions.builder(mSelectedCastDevice, new FlintListener());
         return builder;
     }
 
@@ -1968,7 +1963,7 @@ public class VideoCastManager extends BaseCastManager
         return new VideoMediaRouteDialogFactory();
     }
 
-    class FlingListener extends Fling.Listener {
+    class FlintListener extends Flint.Listener {
 
         /*
          * (non-Javadoc)

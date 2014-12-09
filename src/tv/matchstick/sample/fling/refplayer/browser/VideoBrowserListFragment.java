@@ -28,7 +28,7 @@ import android.widget.ListView;
 
 import java.util.List;
 
-import tv.matchstick.fling.MediaInfo;
+import tv.matchstick.flint.MediaInfo;
 import tv.matchstick.sample.fling.refplayer.R;
 import tv.matchstick.sample.fling.refplayer.mediaplayer.LocalPlayerActivity;
 import tv.matchstick.sample.fling.refplayer.settings.CastPreference;

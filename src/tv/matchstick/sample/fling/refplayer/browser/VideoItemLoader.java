@@ -22,7 +22,7 @@ import android.util.Log;
 
 import java.util.List;
 
-import tv.matchstick.fling.MediaInfo;
+import tv.matchstick.flint.MediaInfo;
 
 public class VideoItemLoader extends AsyncTaskLoader<List<MediaInfo>> {
 

@@ -16,7 +16,7 @@
 
 package com.firefly.sample.castcompanionlibrary.cast.callbacks;
 
-import tv.matchstick.fling.ApplicationMetadata;
+import tv.matchstick.flint.ApplicationMetadata;
 
 public interface IVideoCastConsumer extends IBaseCastConsumer {
 

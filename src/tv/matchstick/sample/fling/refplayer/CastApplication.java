@@ -16,7 +16,7 @@
 
 package tv.matchstick.sample.fling.refplayer;
 
-import tv.matchstick.fling.Fling;
+import tv.matchstick.flint.Flint;
 import tv.matchstick.sample.fling.refplayer.settings.CastPreference;
 
 import com.firefly.sample.castcompanionlibrary.cast.VideoCastManager;
@@ -44,7 +44,7 @@ public class CastApplication extends Application {
         
         mAppContext = getApplicationContext();
         APPLICATION_ID = "~flintplayer";
-        Fling.FlingApi.setApplicationId(APPLICATION_ID);
+        Flint.FlintApi.setApplicationId(APPLICATION_ID);
         Utils.saveFloatToPreference(getApplicationContext(),
                 VideoCastManager.PREFS_KEY_VOLUME_INCREMENT, (float) VOLUME_INCREMENT);
     }

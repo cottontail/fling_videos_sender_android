@@ -41,9 +41,9 @@ import com.firefly.sample.castcompanionlibrary.R;
 
 import java.net.URL;
 
-import tv.matchstick.fling.MediaInfo;
-import tv.matchstick.fling.MediaMetadata;
-import tv.matchstick.fling.MediaStatus;
+import tv.matchstick.flint.MediaInfo;
+import tv.matchstick.flint.MediaMetadata;
+import tv.matchstick.flint.MediaStatus;
 
 /**
  * A custom {@link MediaRouteControllerDialog} that provides an album art, a play/pause button and

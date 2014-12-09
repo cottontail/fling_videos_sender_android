@@ -28,8 +28,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import tv.matchstick.fling.MediaInfo;
-import tv.matchstick.fling.MediaMetadata;
+import tv.matchstick.flint.MediaInfo;
+import tv.matchstick.flint.MediaMetadata;
 import tv.matchstick.sample.fling.refplayer.R;
 
 /**

@@ -16,9 +16,9 @@
 
 package com.firefly.sample.castcompanionlibrary.cast.callbacks;
 
-import tv.matchstick.fling.ApplicationMetadata;
-import tv.matchstick.fling.FlingDevice;
-import tv.matchstick.fling.Status;
+import tv.matchstick.flint.ApplicationMetadata;
+import tv.matchstick.flint.FlintDevice;
+import tv.matchstick.flint.Status;
 
 /**
  * A no-op implementation of the {@link IDataCastConsumer}
@@ -53,7 +53,7 @@ public class DataCastConsumerImpl extends BaseCastConsumerImpl implements IDataC
     }
 
     @Override
-    public void onMessageReceived(FlingDevice flingDevice, String namespace, String message) {
+    public void onMessageReceived(FlintDevice flingDevice, String namespace, String message) {
     }
 
     @Override
@@ -61,7 +61,7 @@ public class DataCastConsumerImpl extends BaseCastConsumerImpl implements IDataC
     }
 
     @Override
-    public void onRemoved(FlingDevice flingDevice, String namespace) {
+    public void onRemoved(FlintDevice flingDevice, String namespace) {
     }
 
 }

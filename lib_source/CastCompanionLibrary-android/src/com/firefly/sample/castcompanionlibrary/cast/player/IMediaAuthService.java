@@ -17,7 +17,7 @@
 
 package com.firefly.sample.castcompanionlibrary.cast.player;
 
-import tv.matchstick.fling.MediaInfo;
+import tv.matchstick.flint.MediaInfo;
 
 /**
  * A public interface if an application requires a pre-authorization of a media, prior to its

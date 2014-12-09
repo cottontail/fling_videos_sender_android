@@ -16,7 +16,7 @@
 
 package com.firefly.sample.castcompanionlibrary.cast.callbacks;
 
-import tv.matchstick.fling.ApplicationMetadata;
+import tv.matchstick.flint.ApplicationMetadata;
 
 /**
  * This is a no-ops implementation of {@link IVideoCastConsumer} so that the clients that like to

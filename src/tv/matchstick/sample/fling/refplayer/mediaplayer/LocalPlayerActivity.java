@@ -55,9 +55,9 @@ import com.firefly.sample.castcompanionlibrary.widgets.MiniController;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import tv.matchstick.fling.ApplicationMetadata;
-import tv.matchstick.fling.MediaInfo;
-import tv.matchstick.fling.MediaMetadata;
+import tv.matchstick.flint.ApplicationMetadata;
+import tv.matchstick.flint.MediaInfo;
+import tv.matchstick.flint.MediaMetadata;
 import tv.matchstick.sample.fling.refplayer.CastApplication;
 import tv.matchstick.sample.fling.refplayer.R;
 import tv.matchstick.sample.fling.refplayer.settings.CastPreference;

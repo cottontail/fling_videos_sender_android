@@ -17,7 +17,7 @@
 package com.firefly.sample.castcompanionlibrary.cast;
 
 import static com.firefly.sample.castcompanionlibrary.utils.LogUtils.LOGD;
-import tv.matchstick.fling.FlingDevice;
+import tv.matchstick.flint.FlintDevice;
 
 import android.content.Context;
 import android.support.v7.media.MediaRouter;
@@ -57,7 +57,7 @@ public class CastMediaRouterCallback extends MediaRouter.Callback {
             return;
         }
         Utils.saveStringToPreference(mContext, BaseCastManager.PREFS_KEY_ROUTE_ID, info.getId());
-        FlingDevice device = FlingDevice.getFromBundle(info.getExtras());
+        FlintDevice device = FlintDevice.getFromBundle(info.getExtras());
         selectDeviceInterface.onDeviceSelected(device);
         LOGD(TAG, "onResult: mSelectedDevice=" + device.getFriendlyName());
     }
@@ -86,7 +86,7 @@ public class CastMediaRouterCallback extends MediaRouter.Callback {
                 BaseCastManager.getCastManager().setReconnectionStatus(
                         ReconnectionStatus.IN_PROGRESS);
 
-                FlingDevice device = FlingDevice.getFromBundle(route.getExtras());
+                FlintDevice device = FlintDevice.getFromBundle(route.getExtras());
                 LOGD(TAG, "onRouteAdded: Attempting to recover a session with device: "
                         + device.getFriendlyName());
                 selectDeviceInterface.onDeviceSelected(device);

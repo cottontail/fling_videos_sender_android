@@ -52,9 +52,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import tv.matchstick.fling.MediaInfo;
-import tv.matchstick.fling.MediaMetadata;
-import tv.matchstick.fling.MediaStatus;
+import tv.matchstick.flint.MediaInfo;
+import tv.matchstick.flint.MediaMetadata;
+import tv.matchstick.flint.MediaStatus;
 
 /**
  * A service to provide status bar Notifications when we are casting. For JB+ versions, notification

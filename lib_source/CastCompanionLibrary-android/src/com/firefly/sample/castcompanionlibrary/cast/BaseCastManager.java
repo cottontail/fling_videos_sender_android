@@ -25,15 +25,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import tv.matchstick.fling.ApplicationMetadata;
-import tv.matchstick.fling.ConnectionResult;
-import tv.matchstick.fling.Fling;
-import tv.matchstick.fling.Fling.ApplicationConnectionResult;
-import tv.matchstick.fling.FlingDevice;
-import tv.matchstick.fling.FlingManager;
-import tv.matchstick.fling.FlingMediaControlIntent;
-import tv.matchstick.fling.ResultCallback;
-import tv.matchstick.fling.Status;
+import tv.matchstick.flint.ApplicationMetadata;
+import tv.matchstick.flint.ConnectionResult;
+import tv.matchstick.flint.Flint;
+import tv.matchstick.flint.Flint.ApplicationConnectionResult;
+import tv.matchstick.flint.FlintDevice;
+import tv.matchstick.flint.FlintManager;
+import tv.matchstick.flint.FlintMediaControlIntent;
+import tv.matchstick.flint.ResultCallback;
+import tv.matchstick.flint.Status;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -64,11 +64,11 @@ import com.firefly.sample.castcompanionlibrary.utils.LogUtils;
 import com.firefly.sample.castcompanionlibrary.utils.Utils;
 
 /**
- * An abstract class that manages connectivity to a cast device. Subclasses are expected to extend
- * the functionality of this class based on their purpose.
+ * An abstract class that manages connectivity to a cast device. Subclasses are
+ * expected to extend the functionality of this class based on their purpose.
  */
-public abstract class BaseCastManager implements DeviceSelectionListener, FlingManager.ConnectionCallbacks,
-FlingManager.OnConnectionFailedListener, OnFailedListener {
+public abstract class BaseCastManager implements DeviceSelectionListener,
+        FlintManager.ConnectionCallbacks, OnFailedListener {
 
     /**
      * Enumerates various stages during a session recovery
@@ -91,14 +91,15 @@ FlingManager.OnConnectionFailedListener, OnFailedListener {
 
     private static String CCL_VERSION;
 
-    private static final String TAG = LogUtils.makeLogTag(BaseCastManager.class);
+    private static final String TAG = LogUtils
+            .makeLogTag(BaseCastManager.class);
     private static final int SESSION_RECOVERY_TIMEOUT = 5; // in seconds
 
     protected Context mContext;
     protected MediaRouter mMediaRouter;
     protected MediaRouteSelector mMediaRouteSelector;
     protected CastMediaRouterCallback mMediaRouterCallback;
-    protected FlingDevice mSelectedCastDevice;
+    protected FlintDevice mSelectedCastDevice;
     protected String mDeviceName;
     private final Set<IBaseCastConsumer> mBaseCastConsumers = Collections
             .synchronizedSet(new HashSet<IBaseCastConsumer>());
@@ -108,7 +109,7 @@ FlingManager.OnConnectionFailedListener, OnFailedListener {
     protected ReconnectionStatus mReconnectionStatus = ReconnectionStatus.INACTIVE;
     protected int mVisibilityCounter;
     protected boolean mUiVisible;
-    protected FlingManager mApiClient;
+    protected FlintManager mApiClient;
     protected AsyncTask<Void, Integer, Integer> mReconnectionTask;
     protected int mCapabilities;
     protected boolean mConnectionSuspened;
@@ -121,53 +122,56 @@ FlingManager.OnConnectionFailedListener, OnFailedListener {
     /*************************************************************************/
 
     /**
-     * A chance for the subclasses to perform what needs to be done when a route is unselected. Most
-     * of the logic is handled by the {@link BaseCastManager} but each subclass may have some
-     * additional logic that can be done, e.g. detaching data or media channels that they may have
-     * set up.
+     * A chance for the subclasses to perform what needs to be done when a route
+     * is unselected. Most of the logic is handled by the
+     * {@link BaseCastManager} but each subclass may have some additional logic
+     * that can be done, e.g. detaching data or media channels that they may
+     * have set up.
      */
     abstract void onDeviceUnselected();
 
     /**
-     * Since application lifecycle callbacks are managed by subclasses, this abstract method needs
-     * to be implemented by each subclass independently.
-     *
+     * Since application lifecycle callbacks are managed by subclasses, this
+     * abstract method needs to be implemented by each subclass independently.
+     * 
      * @param device
      * @return
      */
-    abstract Fling.FlingOptions.Builder getCastOptionBuilder(FlingDevice device);
+    abstract Flint.FlintOptions.Builder getCastOptionBuilder(FlintDevice device);
 
     /**
-     * Subclasses can decide how the Cast Controller Dialog should be built. If this returns
-     * <code>null</code>, the default dialog will be shown.
-     *
+     * Subclasses can decide how the Cast Controller Dialog should be built. If
+     * this returns <code>null</code>, the default dialog will be shown.
+     * 
      * @return
      */
     abstract MediaRouteDialogFactory getMediaRouteDialogFactory();
 
     /**
-     * Subclasses should implement this to react appropriately to the successful launch of their
-     * application. This is called when the application is successfully launched.
-     *
+     * Subclasses should implement this to react appropriately to the successful
+     * launch of their application. This is called when the application is
+     * successfully launched.
+     * 
      * @param applicationMetadata
      * @param applicationStatus
      * @param sessionId
      * @param wasLaunched
      */
-    abstract void onApplicationConnected(ApplicationMetadata applicationMetadata,
-            String applicationStatus, boolean wasLaunched);
+    abstract void onApplicationConnected(
+            ApplicationMetadata applicationMetadata, String applicationStatus,
+            boolean wasLaunched);
 
     /**
-     * Called when the launch of application has failed. Subclasses need to handle this by doing
-     * appropriate clean up.
-     *
+     * Called when the launch of application has failed. Subclasses need to
+     * handle this by doing appropriate clean up.
+     * 
      * @param statusCode
      */
     abstract void onApplicationConnectionFailed(int statusCode);
 
     /**
      * Called when the attempt to stop application has failed.
-     *
+     * 
      * @param statusCode
      */
     abstract void onApplicationStopFailed(int statusCode);
@@ -180,29 +184,34 @@ FlingManager.OnConnectionFailedListener, OnFailedListener {
         mContext = context;
         mHandler = new Handler(Looper.getMainLooper());
         mApplicationId = applicationId;
-        Utils.saveStringToPreference(mContext, PREFS_KEY_APPLICATION_ID, applicationId);
+        Utils.saveStringToPreference(mContext, PREFS_KEY_APPLICATION_ID,
+                applicationId);
 
         LOGD(TAG, "Application ID is: " + mApplicationId);
         mMediaRouter = MediaRouter.getInstance(context);
-        mMediaRouteSelector = new MediaRouteSelector.Builder().addControlCategory(
-                FlingMediaControlIntent.categoryForFling(mApplicationId)).build();
+        mMediaRouteSelector = new MediaRouteSelector.Builder()
+                .addControlCategory(
+                        FlintMediaControlIntent
+                                .categoryForFlint(mApplicationId)).build();
 
         mMediaRouterCallback = new CastMediaRouterCallback(this, context);
         mMediaRouter.addCallback(mMediaRouteSelector, mMediaRouterCallback,
                 MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
     }
-    
+
     protected String getAppUrl() {
-//        if (mSelectedCastDevice != null && mApplicationId.startsWith("app:?")) {
-//            if ("Chromecast".equals(mSelectedCastDevice.getModelName())) {
-//                return FlingMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID;
-//            }
-//        }
+        // if (mSelectedCastDevice != null &&
+        // mApplicationId.startsWith("app:?")) {
+        // if ("Chromecast".equals(mSelectedCastDevice.getModelName())) {
+        // return FlintMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID;
+        // }
+        // }
         return "http://openflint.github.io/flint-player/player.html";
     }
 
     public void onWifiConnectivityChanged(boolean connected) {
-        LOGD(TAG, "WIFI connectivity changed to " + (connected ? "enabled" : "disabled"));
+        LOGD(TAG, "WIFI connectivity changed to "
+                + (connected ? "enabled" : "disabled"));
         if (connected && !mWifiConnectivity) {
             mWifiConnectivity = true;
             mHandler.postDelayed(new Runnable() {
@@ -223,9 +232,9 @@ FlingManager.OnConnectionFailedListener, OnFailedListener {
     }
 
     /**
-     * Sets the {@link Context} for the subsequent calls. Setting context can help the library to
-     * show error messages to the user.
-     *
+     * Sets the {@link Context} for the subsequent calls. Setting context can
+     * help the library to show error messages to the user.
+     * 
      * @param context
      */
     public void setContext(Context context) {
@@ -233,14 +242,15 @@ FlingManager.OnConnectionFailedListener, OnFailedListener {
     }
 
     @Override
-    public void onDeviceSelected(FlingDevice device) {
+    public void onDeviceSelected(FlintDevice device) {
         setDevice(device, mDestroyOnDisconnect);
     }
 
     /**
-     * This is called from {@link com.firefly.sample.castcompanionlibrary.cast.CastMediaRouterCallback}
+     * This is called from
+     * {@link com.firefly.sample.castcompanionlibrary.cast.CastMediaRouterCallback}
      * to signal the change in presence of cast devices on network.
-     *
+     * 
      * @param castPresent
      */
     public void onCastAvailabilityChanged(boolean castPresent) {
@@ -250,20 +260,24 @@ FlingManager.OnConnectionFailedListener, OnFailedListener {
                     try {
                         consumer.onCastAvailabilityChanged(castPresent);
                     } catch (Exception e) {
-                        LOGE(TAG, "onCastAvailabilityChanged(): Failed to inform " + consumer, e);
+                        LOGE(TAG,
+                                "onCastAvailabilityChanged(): Failed to inform "
+                                        + consumer, e);
                     }
                 }
             }
         }
     }
 
-    public void setDevice(FlingDevice device, boolean stopAppOnExit) {
+    public void setDevice(FlintDevice device, boolean stopAppOnExit) {
         mSelectedCastDevice = device;
-        mDeviceName = mSelectedCastDevice != null ? mSelectedCastDevice.getFriendlyName() : null;
+        mDeviceName = mSelectedCastDevice != null ? mSelectedCastDevice
+                .getFriendlyName() : null;
 
         if (mSelectedCastDevice == null) {
             if (!mConnectionSuspened) {
-                Utils.saveStringToPreference(mContext, PREFS_KEY_SESSION_ID, null);
+                Utils.saveStringToPreference(mContext, PREFS_KEY_SESSION_ID,
+                        null);
                 Utils.saveStringToPreference(mContext, PREFS_KEY_ROUTE_ID, null);
             }
             mConnectionSuspened = false;
@@ -275,13 +289,21 @@ FlingManager.OnConnectionFailedListener, OnFailedListener {
                     }
                 }
             } catch (IllegalStateException e) {
-                LOGE(TAG, "Failed to stop the application after disconnecting route", e);
+                LOGE(TAG,
+                        "Failed to stop the application after disconnecting route",
+                        e);
             } catch (IOException e) {
-                LOGE(TAG, "Failed to stop the application after disconnecting route", e);
+                LOGE(TAG,
+                        "Failed to stop the application after disconnecting route",
+                        e);
             } catch (TransientNetworkDisconnectionException e) {
-                LOGE(TAG, "Failed to stop the application after disconnecting route", e);
+                LOGE(TAG,
+                        "Failed to stop the application after disconnecting route",
+                        e);
             } catch (NoConnectionException e) {
-                LOGE(TAG, "Failed to stop the application after disconnecting route", e);
+                LOGE(TAG,
+                        "Failed to stop the application after disconnecting route",
+                        e);
             }
             onDisconnected();
             onDeviceUnselected();
@@ -295,12 +317,12 @@ FlingManager.OnConnectionFailedListener, OnFailedListener {
             }
             mSessionId = null;
         } else if (null == mApiClient) {
-            LOGD(TAG, "acquiring a connection to Google Play services for " + mSelectedCastDevice);
-            Fling.FlingOptions.Builder apiOptionsBuilder = getCastOptionBuilder(mSelectedCastDevice);
-            mApiClient = new FlingManager.Builder(mContext)
-                    .addApi(Fling.API, apiOptionsBuilder.build())
+            LOGD(TAG, "acquiring a connection to Google Play services for "
+                    + mSelectedCastDevice);
+            Flint.FlintOptions.Builder apiOptionsBuilder = getCastOptionBuilder(mSelectedCastDevice);
+            mApiClient = new FlintManager.Builder(mContext)
+                    .addApi(Flint.API, apiOptionsBuilder.build())
                     .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
                     .build();
             mApiClient.connect();
         } else if (!mApiClient.isConnected()) {
@@ -316,7 +338,8 @@ FlingManager.OnConnectionFailedListener, OnFailedListener {
                     try {
                         consumer.onCastDeviceDetected(info);
                     } catch (Exception e) {
-                        LOGE(TAG, "onCastDeviceDetected(): Failed to inform " + consumer, e);
+                        LOGE(TAG, "onCastDeviceDetected(): Failed to inform "
+                                + consumer, e);
                     }
                 }
             }
@@ -324,49 +347,56 @@ FlingManager.OnConnectionFailedListener, OnFailedListener {
     }
 
     /**
-     * Adds and wires up the Media Router cast button. It returns a pointer to the Media Router menu
-     * item if the caller needs such reference. It is assumed that the enclosing
-     * {@link android.app.Activity} inherits (directly or indirectly) from
+     * Adds and wires up the Media Router cast button. It returns a pointer to
+     * the Media Router menu item if the caller needs such reference. It is
+     * assumed that the enclosing {@link android.app.Activity} inherits
+     * (directly or indirectly) from
      * {@link android.support.v7.app.ActionBarActivity}.
-     *
+     * 
      * @param menu
-     * @param menuResourceId The resource id of the cast button in the xml menu descriptor file
+     * @param menuResourceId
+     *            The resource id of the cast button in the xml menu descriptor
+     *            file
      * @return
      */
     public MenuItem addMediaRouterButton(Menu menu, int menuResourceId) {
         MenuItem mediaRouteMenuItem = menu.findItem(menuResourceId);
-        MediaRouteActionProvider mediaRouteActionProvider = (MediaRouteActionProvider)
-                MenuItemCompat.getActionProvider(mediaRouteMenuItem);
+        MediaRouteActionProvider mediaRouteActionProvider = (MediaRouteActionProvider) MenuItemCompat
+                .getActionProvider(mediaRouteMenuItem);
         mediaRouteActionProvider.setRouteSelector(mMediaRouteSelector);
         if (null != getMediaRouteDialogFactory()) {
-            mediaRouteActionProvider.setDialogFactory(getMediaRouteDialogFactory());
+            mediaRouteActionProvider
+                    .setDialogFactory(getMediaRouteDialogFactory());
         }
         return mediaRouteMenuItem;
     }
 
     /**
-     * Adds and wires up the {@link android.support.v7.app.MediaRouteButton} instance that is passed
-     * as an argument. This requires that
+     * Adds and wires up the {@link android.support.v7.app.MediaRouteButton}
+     * instance that is passed as an argument. This requires that
      * <ul>
-     *     <li>The enclosing {@link android.app.Activity} inherits (directly or indirectly) from
-     *     {@link android.support.v4.app.FragmentActivity}</li>
-     *     <li>User adds the {@link android.support.v7.app.MediaRouteButton} to the layout and
-     *     pass a reference to that instance to this method</li>
-     *     <li>User is in charge of controlling the visibility of this button. However, this
-     *     library makes it easier to do so: use the callback
-     *     <code>onCastAvailabilityChanged(boolean)</code> to change the visibility of the button in
-     *     your client. For example, extend
-     *     {@link com.firefly.sample.castcompanionlibrary.cast.callbacks.VideoCastConsumerImpl}
-     *     and override that method:
-     *     <pre>
-{@code
-public void onCastAvailabilityChanged(boolean castPresent) {
-    mMediaRouteButton.setVisibility(castPresent ? View.VISIBLE : View.INVISIBLE);
-}
-    }
-     *     </pre>
-     *     </li>
+     * <li>The enclosing {@link android.app.Activity} inherits (directly or
+     * indirectly) from {@link android.support.v4.app.FragmentActivity}</li>
+     * <li>User adds the {@link android.support.v7.app.MediaRouteButton} to the
+     * layout and pass a reference to that instance to this method</li>
+     * <li>User is in charge of controlling the visibility of this button.
+     * However, this library makes it easier to do so: use the callback
+     * <code>onCastAvailabilityChanged(boolean)</code> to change the visibility
+     * of the button in your client. For example, extend
+     * {@link com.firefly.sample.castcompanionlibrary.cast.callbacks.VideoCastConsumerImpl}
+     * and override that method:
+     * 
+     * <pre>
+     * {@code
+     * public void onCastAvailabilityChanged(boolean castPresent) {
+     *     mMediaRouteButton.setVisibility(castPresent ? View.VISIBLE : View.INVISIBLE);
+     * }
+     *     }
+     * </pre>
+     * 
+     * </li>
      * </ul>
+     * 
      * @param button
      * @return
      */
@@ -383,10 +413,11 @@ public void onCastAvailabilityChanged(boolean castPresent) {
     /*************************************************************************/
 
     /**
-     * Calling this method signals the library that an activity page is made visible. In common
-     * cases, this should be called in the "onResume()" method of each activity of the application.
-     * The library keeps a counter and when at least one page of the application becomes visible,
-     * the {@link onUiVisibilityChanged()} method is called.
+     * Calling this method signals the library that an activity page is made
+     * visible. In common cases, this should be called in the "onResume()"
+     * method of each activity of the application. The library keeps a counter
+     * and when at least one page of the application becomes visible, the
+     * {@link onUiVisibilityChanged()} method is called.
      */
     public synchronized void incrementUiCounter() {
         mVisibilityCounter++;
@@ -402,10 +433,11 @@ public void onCastAvailabilityChanged(boolean castPresent) {
     }
 
     /**
-     * Calling this method signals the library that an activity page is made invisible. In common
-     * cases, this should be called in the "onPause()" method of each activity of the application.
-     * The library keeps a counter and when all pages of the application become invisible, the
-     * {@link onUiVisibilityChanged()} method is called.
+     * Calling this method signals the library that an activity page is made
+     * invisible. In common cases, this should be called in the "onPause()"
+     * method of each activity of the application. The library keeps a counter
+     * and when all pages of the application become invisible, the {@link
+     * onUiVisibilityChanged()} method is called.
      */
     public synchronized void decrementUiCounter() {
         if (--mVisibilityCounter == 0) {
@@ -421,14 +453,16 @@ public void onCastAvailabilityChanged(boolean castPresent) {
 
     /**
      * This is called when UI visibility of the client has changed
-     *
-     * @param visible The updated visibility status
+     * 
+     * @param visible
+     *            The updated visibility status
      */
     protected void onUiVisibilityChanged(boolean visible) {
         if (visible) {
             if (null != mMediaRouter && null != mMediaRouterCallback) {
                 LOGD(TAG, "onUiVisibilityChanged() addCallback called");
-                mMediaRouter.addCallback(mMediaRouteSelector, mMediaRouterCallback,
+                mMediaRouter.addCallback(mMediaRouteSelector,
+                        mMediaRouterCallback,
                         MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
             }
         } else {
@@ -444,12 +478,13 @@ public void onCastAvailabilityChanged(boolean castPresent) {
     /*************************************************************************/
 
     /**
-     * A utility method to validate that the appropriate version of the Google Play Services is
-     * available on the device. If not, it will open a dialog to address the issue. The dialog
-     * displays a localized message about the error and upon user confirmation (by tapping on
-     * dialog) will direct them to the Play Store if Google Play services is out of date or missing,
-     * or to system settings if Google Play services is disabled on the device.
-     *
+     * A utility method to validate that the appropriate version of the Google
+     * Play Services is available on the device. If not, it will open a dialog
+     * to address the issue. The dialog displays a localized message about the
+     * error and upon user confirmation (by tapping on dialog) will direct them
+     * to the Play Store if Google Play services is out of date or missing, or
+     * to system settings if Google Play services is disabled on the device.
+     * 
      * @param activity
      * @return
      */
@@ -465,8 +500,9 @@ public void onCastAvailabilityChanged(boolean castPresent) {
     }
 
     /**
-     * can be used to find out if the application is connected to the service or not.
-     *
+     * can be used to find out if the application is connected to the service or
+     * not.
+     * 
      * @return <code>true</code> if connected, <code>false</code> otherwise.
      */
     public boolean isConnected() {
@@ -474,7 +510,8 @@ public void onCastAvailabilityChanged(boolean castPresent) {
     }
 
     /**
-     * Disconnects from the cast device and stops the application on the cast device.
+     * Disconnects from the cast device and stops the application on the cast
+     * device.
      */
     public void disconnect() {
         if (isConnected()) {
@@ -483,9 +520,9 @@ public void onCastAvailabilityChanged(boolean castPresent) {
     }
 
     /**
-     * Returns the assigned human-readable name of the device, or <code>null</code> if no device is
-     * connected.
-     *
+     * Returns the assigned human-readable name of the device, or
+     * <code>null</code> if no device is connected.
+     * 
      * @return
      */
     public final String getDeviceName() {
@@ -493,10 +530,11 @@ public void onCastAvailabilityChanged(boolean castPresent) {
     }
 
     /**
-     * Sets a flag to control whether disconnection form a cast device should result in stopping the
-     * running application or not. If <code>true</code> is passed, then application will be stopped.
-     * Default behavior is not to stop the app.
-     *
+     * Sets a flag to control whether disconnection form a cast device should
+     * result in stopping the running application or not. If <code>true</code>
+     * is passed, then application will be stopped. Default behavior is not to
+     * stop the app.
+     * 
      * @param stopOnExit
      */
     public final void setStopOnDisconnect(boolean stopOnExit) {
@@ -505,7 +543,7 @@ public void onCastAvailabilityChanged(boolean castPresent) {
 
     /**
      * Returns the {@link MediaRouteSelector} object.
-     *
+     * 
      * @return
      */
     public final MediaRouteSelector getMediaRouteSelector() {
@@ -513,19 +551,20 @@ public void onCastAvailabilityChanged(boolean castPresent) {
     }
 
     /**
-     * Turns on configurable features in the library. All the supported features are turned off by
-     * default and clients, prior to using them, need to turn them on; it is best to do is
-     * immediately after initialization of the library. Bitwise OR combination of features should be
-     * passed in if multiple features are needed
+     * Turns on configurable features in the library. All the supported features
+     * are turned off by default and clients, prior to using them, need to turn
+     * them on; it is best to do is immediately after initialization of the
+     * library. Bitwise OR combination of features should be passed in if
+     * multiple features are needed
      * <p/>
      * Current set of configurable features are:
      * <ul>
      * <li>FEATURE_DEBUGGING : turns on debugging in Google Play services
      * <li>FEATURE_NOTIFICATION : turns notifications on
-     * <li>FEATURE_LOCKSCREEN : turns on Lock Screen using {@link RemoteControlClient} in supported
-     * versions (JB+)
+     * <li>FEATURE_LOCKSCREEN : turns on Lock Screen using
+     * {@link RemoteControlClient} in supported versions (JB+)
      * </ul>
-     *
+     * 
      * @param capabilities
      */
     public void enableFeatures(int capabilities) {
@@ -541,8 +580,9 @@ public void onCastAvailabilityChanged(boolean castPresent) {
 
     /**
      * Sets the device (system) volume.
-     *
-     * @param volume Should be a value between 0 and 1, inclusive.
+     * 
+     * @param volume
+     *            Should be a value between 0 and 1, inclusive.
      * @throws CastException
      * @throws NoConnectionException
      * @throws TransientNetworkDisconnectionException
@@ -551,7 +591,7 @@ public void onCastAvailabilityChanged(boolean castPresent) {
             TransientNetworkDisconnectionException, NoConnectionException {
         checkConnectivity();
         try {
-            Fling.FlingApi.setVolume(mApiClient, volume);
+            Flint.FlintApi.setVolume(mApiClient, volume);
         } catch (Exception e) {
             LOGE(TAG, "Failed to set volume", e);
             throw new CastException("Failed to set volume");
@@ -560,19 +600,20 @@ public void onCastAvailabilityChanged(boolean castPresent) {
 
     /**
      * Gets the remote's system volume, a number between 0 and 1, inclusive.
-     *
+     * 
      * @throws NoConnectionException
      * @throws TransientNetworkDisconnectionException
      */
-    public final double getDeviceVolume() throws TransientNetworkDisconnectionException,
+    public final double getDeviceVolume()
+            throws TransientNetworkDisconnectionException,
             NoConnectionException {
         checkConnectivity();
-        return Fling.FlingApi.getVolume(mApiClient);
+        return Flint.FlintApi.getVolume(mApiClient);
     }
 
     /**
      * Increments (or decrements) the device volume by the given amount.
-     *
+     * 
      * @param delta
      * @throws CastException
      * @throws NoConnectionException
@@ -588,22 +629,24 @@ public void onCastAvailabilityChanged(boolean castPresent) {
     }
 
     /**
-     * Returns <code>true</code> if remote device is muted. It internally determines if this should
-     * be done for <code>stream</code> or <code>device</code> volume.
-     *
+     * Returns <code>true</code> if remote device is muted. It internally
+     * determines if this should be done for <code>stream</code> or
+     * <code>device</code> volume.
+     * 
      * @return
      * @throws NoConnectionException
      * @throws TransientNetworkDisconnectionException
      */
-    public final boolean isDeviceMute() throws TransientNetworkDisconnectionException,
+    public final boolean isDeviceMute()
+            throws TransientNetworkDisconnectionException,
             NoConnectionException {
         checkConnectivity();
-        return Fling.FlingApi.isMute(mApiClient);
+        return Flint.FlintApi.isMute(mApiClient);
     }
 
     /**
      * Mutes or un-mutes the device volume.
-     *
+     * 
      * @param mute
      * @throws CastException
      * @throws NoConnectionException
@@ -613,7 +656,7 @@ public void onCastAvailabilityChanged(boolean castPresent) {
             TransientNetworkDisconnectionException, NoConnectionException {
         checkConnectivity();
         try {
-            Fling.FlingApi.setMute(mApiClient, mute);
+            Flint.FlintApi.setMute(mApiClient, mute);
         } catch (Exception e) {
             LOGE(TAG, "Failed to set mute to: " + mute, e);
             throw new CastException("Failed to mute");
@@ -621,21 +664,22 @@ public void onCastAvailabilityChanged(boolean castPresent) {
     }
 
     /**
-     * Clears the {@link android.content.Context}. Should be used when the client application is
-     * being destroyed to avoid context leak.
+     * Clears the {@link android.content.Context}. Should be used when the
+     * client application is being destroyed to avoid context leak.
      */
-    public void clearContext(){
+    public void clearContext() {
         this.mContext = null;
     }
 
     /**
-     * Clears the {@link android.content.Context} if the current context is the same as the one
-     * provided in the argument <code>context</code>. Should be used when the client application
-     * is being destroyed to avoid context leak.
-     *
+     * Clears the {@link android.content.Context} if the current context is the
+     * same as the one provided in the argument <code>context</code>. Should be
+     * used when the client application is being destroyed to avoid context
+     * leak.
+     * 
      * @param context
      */
-    public void clearContext(Context context){
+    public void clearContext(Context context) {
         if (null != this.mContext && this.mContext == context) {
             LOGD(TAG, "Cleared context: " + context);
             this.mContext = null;
@@ -648,7 +692,7 @@ public void onCastAvailabilityChanged(boolean castPresent) {
 
     /**
      * Returns the current {@link ReconnectionStatus}
-     *
+     * 
      * @return
      */
     public ReconnectionStatus getReconnectionStatus() {
@@ -657,7 +701,7 @@ public void onCastAvailabilityChanged(boolean castPresent) {
 
     /**
      * Sets the {@link ReconnectionStatus}
-     *
+     * 
      * @param status
      */
     public final void setReconnectionStatus(ReconnectionStatus status) {
@@ -665,16 +709,19 @@ public void onCastAvailabilityChanged(boolean castPresent) {
     }
 
     /**
-     * Returns <code>true</code> if there is enough persisted information to attempt a session
-     * recovery. For this to return <code>true</code>, there needs to be persisted session ID and
-     * route ID from the last successful launch.
-     *
+     * Returns <code>true</code> if there is enough persisted information to
+     * attempt a session recovery. For this to return <code>true</code>, there
+     * needs to be persisted session ID and route ID from the last successful
+     * launch.
+     * 
      * @param context
      * @return
      */
     public final boolean canConsiderSessionRecovery(Context context) {
-        String sessionId = Utils.getStringFromPreference(context, PREFS_KEY_SESSION_ID);
-        String routeId = Utils.getStringFromPreference(context, PREFS_KEY_ROUTE_ID);
+        String sessionId = Utils.getStringFromPreference(context,
+                PREFS_KEY_SESSION_ID);
+        String routeId = Utils.getStringFromPreference(context,
+                PREFS_KEY_ROUTE_ID);
         if (null == sessionId || null == routeId) {
             return false;
         }
@@ -687,15 +734,17 @@ public void onCastAvailabilityChanged(boolean castPresent) {
         if (isConnected()) {
             return;
         }
-        String sessionId = Utils.getStringFromPreference(mContext, PREFS_KEY_SESSION_ID);
-        String routeId = Utils.getStringFromPreference(mContext, PREFS_KEY_ROUTE_ID);
-        LOGD(TAG, "reconnectSessionIfPossible() Retrieved from preferences: " + "sessionId="
-                + sessionId + ", routeId=" + routeId);
+        String sessionId = Utils.getStringFromPreference(mContext,
+                PREFS_KEY_SESSION_ID);
+        String routeId = Utils.getStringFromPreference(mContext,
+                PREFS_KEY_ROUTE_ID);
+        LOGD(TAG, "reconnectSessionIfPossible() Retrieved from preferences: "
+                + "sessionId=" + sessionId + ", routeId=" + routeId);
         if (null == sessionId || null == routeId) {
             return;
         }
         mReconnectionStatus = ReconnectionStatus.IN_PROGRESS;
-        FlingDevice device = FlingDevice.getFromBundle(theRoute.getExtras());
+        FlintDevice device = FlintDevice.getFromBundle(theRoute.getExtras());
 
         if (null != device) {
             LOGD(TAG, "trying to acquire Cast Client for " + device);
@@ -704,7 +753,8 @@ public void onCastAvailabilityChanged(boolean castPresent) {
     }
 
     /*
-     * Cancels the task responsible for recovery of prior sessions, is used internally.
+     * Cancels the task responsible for recovery of prior sessions, is used
+     * internally.
      */
     void cancelReconnectionTask() {
         LOGD(TAG, "cancelling reconnection task");
@@ -714,28 +764,33 @@ public void onCastAvailabilityChanged(boolean castPresent) {
     }
 
     /**
-     * This method tries to automatically re-establish connection to a session if
+     * This method tries to automatically re-establish connection to a session
+     * if
      * <ul>
      * <li>User had not done a manual disconnect in the last session
-     * <li>The Cast Device that user had connected to previously is still running the same session
+     * <li>The Cast Device that user had connected to previously is still
+     * running the same session
      * </ul>
-     * Under these conditions, a best-effort attempt will be made to continue with the same session.
-     * This attempt will go on for <code>timeoutInSeconds</code> seconds. During this period, an
-     * optional dialog can be shown if <code>showDialog</code> is set to <code>true</code>. The
-     * message in this dialog can be changed by overriding the resource
+     * Under these conditions, a best-effort attempt will be made to continue
+     * with the same session. This attempt will go on for
+     * <code>timeoutInSeconds</code> seconds. During this period, an optional
+     * dialog can be shown if <code>showDialog</code> is set to
+     * <code>true</code>. The message in this dialog can be changed by
+     * overriding the resource
      * <code>R.string.session_reconnection_attempt</code>
-     *
+     * 
      * @param context
      * @param showDialog
      * @param timeoutInSeconds
      */
-    public void reconnectSessionIfPossible(final Context context, final boolean showDialog,
-            final int timeoutInSeconds) {
+    public void reconnectSessionIfPossible(final Context context,
+            final boolean showDialog, final int timeoutInSeconds) {
         if (isConnected()) {
             return;
         }
         LOGD(TAG, "reconnectSessionIfPossible()");
-        String routeId = Utils.getStringFromPreference(context, PREFS_KEY_ROUTE_ID);
+        String routeId = Utils.getStringFromPreference(context,
+                PREFS_KEY_ROUTE_ID);
         if (canConsiderSessionRecovery(context)) {
             List<RouteInfo> routes = mMediaRouter.getRoutes();
             RouteInfo theRoute = null;
@@ -779,7 +834,8 @@ public void onCastAvailabilityChanged(boolean castPresent) {
                         return;
                     }
                     dlg = new ProgressDialog(context);
-                    dlg.setMessage(context.getString(R.string.session_reconnection_attempt));
+                    dlg.setMessage(context
+                            .getString(R.string.session_reconnection_attempt));
                     dlg.setIndeterminate(true);
                     dlg.setCancelable(true);
                     dlg.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -787,14 +843,14 @@ public void onCastAvailabilityChanged(boolean castPresent) {
                         @Override
                         public void onCancel(DialogInterface dialog) {
                             switch (mReconnectionStatus) {
-                                case STARTED:
-                                case IN_PROGRESS:
-                                case FINALIZE:
-                                    mReconnectionStatus = ReconnectionStatus.INACTIVE;
-                                    onDeviceSelected(null);
-                                    break;
-                                default:
-                                    break;
+                            case STARTED:
+                            case IN_PROGRESS:
+                            case FINALIZE:
+                                mReconnectionStatus = ReconnectionStatus.INACTIVE;
+                                onDeviceSelected(null);
+                                break;
+                            default:
+                                break;
                             }
                             mReconnectionStatus = ReconnectionStatus.INACTIVE;
                             if (null != dlg) {
@@ -807,16 +863,17 @@ public void onCastAvailabilityChanged(boolean castPresent) {
                             new DialogInterface.OnClickListener() {
 
                                 @Override
-                                public void onClick(DialogInterface dialog, int which) {
+                                public void onClick(DialogInterface dialog,
+                                        int which) {
                                     switch (mReconnectionStatus) {
-                                        case STARTED:
-                                        case IN_PROGRESS:
-                                        case FINALIZE:
-                                            mReconnectionStatus = ReconnectionStatus.INACTIVE;
-                                            onDeviceSelected(null);
-                                            break;
-                                        default:
-                                            break;
+                                    case STARTED:
+                                    case IN_PROGRESS:
+                                    case FINALIZE:
+                                        mReconnectionStatus = ReconnectionStatus.INACTIVE;
+                                        onDeviceSelected(null);
+                                        break;
+                                    default:
+                                        break;
                                     }
                                     mReconnectionStatus = ReconnectionStatus.INACTIVE;
                                     if (null != dlg) {
@@ -824,8 +881,7 @@ public void onCastAvailabilityChanged(boolean castPresent) {
                                     }
                                     mReconnectionTask.cancel(true);
                                 }
-                            }
-                    );
+                            });
                     dlg.show();
                 }
 
@@ -869,30 +925,37 @@ public void onCastAvailabilityChanged(boolean castPresent) {
     }
 
     /**
-     * This method tries to automatically re-establish re-establish connection to a session if
+     * This method tries to automatically re-establish re-establish connection
+     * to a session if
      * <ul>
      * <li>User had not done a manual disconnect in the last session
-     * <li>Device that user had connected to previously is still running the same session
+     * <li>Device that user had connected to previously is still running the
+     * same session
      * </ul>
-     * Under these conditions, a best-effort attempt will be made to continue with the same session.
-     * This attempt will go on for 5 seconds. During this period, an optional dialog can be shown if
-     * <code>showDialog</code> is set to <code>true
+     * Under these conditions, a best-effort attempt will be made to continue
+     * with the same session. This attempt will go on for 5 seconds. During this
+     * period, an optional dialog can be shown if <code>showDialog</code> is set
+     * to <code>true
      * </code>.
-     *
+     * 
      * @param context
-     * @param showDialog if set to <code>true</code>, a dialog will be shown
+     * @param showDialog
+     *            if set to <code>true</code>, a dialog will be shown
      */
-    public void reconnectSessionIfPossible(final Context context, final boolean showDialog) {
-        LOGD(TAG, "Context for calling reconnectSessionIfPossible(): " + context);
-        reconnectSessionIfPossible(context, showDialog, SESSION_RECOVERY_TIMEOUT);
+    public void reconnectSessionIfPossible(final Context context,
+            final boolean showDialog) {
+        LOGD(TAG, "Context for calling reconnectSessionIfPossible(): "
+                + context);
+        reconnectSessionIfPossible(context, showDialog,
+                SESSION_RECOVERY_TIMEOUT);
     }
 
     /************************************************************/
     /***** GoogleApiClient.ConnectionCallbacks ******************/
     /************************************************************/
     /**
-     * This is called by the library when a connection is re-established after a transient
-     * disconnect. Note: this is not called by SDK.
+     * This is called by the library when a connection is re-established after a
+     * transient disconnect. Note: this is not called by SDK.
      */
     public void onConnectivityRecovered() {
         if (null != mBaseCastConsumers) {
@@ -901,7 +964,8 @@ public void onCastAvailabilityChanged(boolean castPresent) {
                     try {
                         consumer.onConnectivityRecovered();
                     } catch (Exception e) {
-                        LOGE(TAG, "onConnectivityRecovered: Failed to inform " + consumer, e);
+                        LOGE(TAG, "onConnectivityRecovered: Failed to inform "
+                                + consumer, e);
                     }
                 }
             }
@@ -910,12 +974,15 @@ public void onCastAvailabilityChanged(boolean castPresent) {
 
     /*
      * (non-Javadoc)
-     * @see com.google.android.gms.GoogleApiClient.ConnectionCallbacks#onConnected
+     * 
+     * @see
+     * com.google.android.gms.GoogleApiClient.ConnectionCallbacks#onConnected
      * (android.os.Bundle)
      */
     @Override
     public void onConnected(Bundle arg0) {
-        LOGD(TAG, "onConnected() reached with prior suspension: " + mConnectionSuspened);
+        LOGD(TAG, "onConnected() reached with prior suspension: "
+                + mConnectionSuspened);
         if (mConnectionSuspened) {
             mConnectionSuspened = false;
             onConnectivityRecovered();
@@ -928,7 +995,7 @@ public void onCastAvailabilityChanged(boolean castPresent) {
             return;
         }
         try {
-            Fling.FlingApi.requestStatus(mApiClient);
+            Flint.FlintApi.requestStatus(mApiClient);
             launchApp();
 
             if (null != mBaseCastConsumers) {
@@ -937,7 +1004,8 @@ public void onCastAvailabilityChanged(boolean castPresent) {
                         try {
                             consumer.onConnected();
                         } catch (Exception e) {
-                            LOGE(TAG, "onConnected: Failed to inform " + consumer, e);
+                            LOGE(TAG, "onConnected: Failed to inform "
+                                    + consumer, e);
                         }
                     }
                 }
@@ -956,8 +1024,8 @@ public void onCastAvailabilityChanged(boolean castPresent) {
     }
 
     /*
-     * Note: this is not called by the SDK anymore but this library calls this in the appropriate
-     * time.
+     * Note: this is not called by the SDK anymore but this library calls this
+     * in the appropriate time.
      */
     protected void onDisconnected() {
         LOGD(TAG, "onDisconnected() reached");
@@ -968,7 +1036,8 @@ public void onCastAvailabilityChanged(boolean castPresent) {
                     try {
                         consumer.onDisconnected();
                     } catch (Exception e) {
-                        LOGE(TAG, "onDisconnected(): Failed to inform " + consumer, e);
+                        LOGE(TAG, "onDisconnected(): Failed to inform "
+                                + consumer, e);
                     }
                 }
             }
@@ -977,13 +1046,16 @@ public void onCastAvailabilityChanged(boolean castPresent) {
 
     /*
      * (non-Javadoc)
+     * 
      * @see com.google.android.gms.GoogleApiClient.OnConnectionFailedListener#
      * onConnectionFailed(com.google.android.gms.common.ConnectionResult)
      */
     @Override
     public void onConnectionFailed(ConnectionResult result) {
-        LOGD(TAG, "onConnectionFailed() reached, error code: " + result.getErrorCode()
-                + ", reason: " + result.toString());
+        LOGD(TAG,
+                "onConnectionFailed() reached, error code: "
+                        + result.getErrorCode() + ", reason: "
+                        + result.toString());
         mConnectionSuspened = false;
         setDevice(null, mDestroyOnDisconnect);
         if (null != mMediaRouter) {
@@ -996,7 +1068,8 @@ public void onCastAvailabilityChanged(boolean castPresent) {
                     try {
                         consumer.onConnectionFailed(result);
                     } catch (Exception e) {
-                        LOGE(TAG, "onConnectionFailed(): Failed to inform " + consumer, e);
+                        LOGE(TAG, "onConnectionFailed(): Failed to inform "
+                                + consumer, e);
                     }
                 }
             }
@@ -1016,7 +1089,8 @@ public void onCastAvailabilityChanged(boolean castPresent) {
                     try {
                         consumer.onConnectionSuspended(cause);
                     } catch (Exception e) {
-                        LOGE(TAG, "onConnectionSuspended(): Failed to inform " + consumer, e);
+                        LOGE(TAG, "onConnectionSuspended(): Failed to inform "
+                                + consumer, e);
                     }
                 }
             }
@@ -1024,10 +1098,11 @@ public void onCastAvailabilityChanged(boolean castPresent) {
     }
 
     /*
-     * Launches application. For this succeed, a connection should be already established by the
-     * CastClient.
+     * Launches application. For this succeed, a connection should be already
+     * established by the CastClient.
      */
-    private void launchApp() throws TransientNetworkDisconnectionException, NoConnectionException {
+    private void launchApp() throws TransientNetworkDisconnectionException,
+            NoConnectionException {
         LOGD(TAG, "launchApp() is called");
         if (!isConnected()) {
             if (mReconnectionStatus == ReconnectionStatus.IN_PROGRESS) {
@@ -1039,50 +1114,63 @@ public void onCastAvailabilityChanged(boolean castPresent) {
 
         if (mReconnectionStatus == ReconnectionStatus.IN_PROGRESS) {
             LOGD(TAG, "Attempting to join a previously interrupted session...");
-            String sessionId = Utils.getStringFromPreference(mContext, PREFS_KEY_SESSION_ID);
+            String sessionId = Utils.getStringFromPreference(mContext,
+                    PREFS_KEY_SESSION_ID);
             LOGD(TAG, "joinApplication() -> start");
-            Fling.FlingApi.joinApplication(mApiClient, getAppUrl()).setResultCallback(
-                    new ResultCallback<Fling.ApplicationConnectionResult>() {
+            Flint.FlintApi
+                    .joinApplication(mApiClient, getAppUrl())
+                    .setResultCallback(
+                            new ResultCallback<Flint.ApplicationConnectionResult>() {
 
-                        @Override
-                        public void onResult(ApplicationConnectionResult result) {
-                            if (result.getStatus().isSuccess()) {
-                                LOGD(TAG, "joinApplication() -> success");
-                                onApplicationConnected(result.getApplicationMetadata(),
-                                        result.getApplicationStatus(),
-                                        result.getWasLaunched());
-                            } else {
-                                LOGD(TAG, "joinApplication() -> failure");
-                                onApplicationConnectionFailed(result.getStatus().getStatusCode());
-                            }
-                        }
-                    }
-            );
+                                @Override
+                                public void onResult(
+                                        ApplicationConnectionResult result) {
+                                    if (result.getStatus().isSuccess()) {
+                                        LOGD(TAG,
+                                                "joinApplication() -> success");
+                                        onApplicationConnected(
+                                                result.getApplicationMetadata(),
+                                                result.getApplicationStatus(),
+                                                result.getWasLaunched());
+                                    } else {
+                                        LOGD(TAG,
+                                                "joinApplication() -> failure");
+                                        onApplicationConnectionFailed(result
+                                                .getStatus().getStatusCode());
+                                    }
+                                }
+                            });
         } else {
             LOGD(TAG, "Launching app");
-            Fling.FlingApi.launchApplication(mApiClient, getAppUrl()).setResultCallback(
-                    new ResultCallback<Fling.ApplicationConnectionResult>() {
+            Flint.FlintApi
+                    .launchApplication(mApiClient, getAppUrl())
+                    .setResultCallback(
+                            new ResultCallback<Flint.ApplicationConnectionResult>() {
 
-                        @Override
-                        public void onResult(ApplicationConnectionResult result) {
-                            if (result.getStatus().isSuccess()) {
-                                LOGD(TAG, "launchApplication() -> success result");
-                                onApplicationConnected(result.getApplicationMetadata(),
-                                        result.getApplicationStatus(),
-                                        result.getWasLaunched());
-                            } else {
-                                LOGD(TAG, "launchApplication() -> failure result");
-                                onApplicationConnectionFailed(result.getStatus().getStatusCode());
-                            }
-                        }
-                    }
-            );
+                                @Override
+                                public void onResult(
+                                        ApplicationConnectionResult result) {
+                                    if (result.getStatus().isSuccess()) {
+                                        LOGD(TAG,
+                                                "launchApplication() -> success result");
+                                        onApplicationConnected(
+                                                result.getApplicationMetadata(),
+                                                result.getApplicationStatus(),
+                                                result.getWasLaunched());
+                                    } else {
+                                        LOGD(TAG,
+                                                "launchApplication() -> failure result");
+                                        onApplicationConnectionFailed(result
+                                                .getStatus().getStatusCode());
+                                    }
+                                }
+                            });
         }
     }
 
     /**
      * Stops the application on the receiver device.
-     *
+     * 
      * @throws IllegalStateException
      * @throws IOException
      * @throws NoConnectionException
@@ -1091,27 +1179,32 @@ public void onCastAvailabilityChanged(boolean castPresent) {
     public void stopApplication() throws IllegalStateException, IOException,
             TransientNetworkDisconnectionException, NoConnectionException {
         checkConnectivity();
-        Fling.FlingApi.stopApplication(mApiClient).setResultCallback(new ResultCallback<Status>() {
+        Flint.FlintApi.stopApplication(mApiClient).setResultCallback(
+                new ResultCallback<Status>() {
 
-            @Override
-            public void onResult(Status result) {
-                if (!result.isSuccess()) {
-                    LOGD(TAG, "stopApplication -> onResult: stopping " + "application failed");
-                    onApplicationStopFailed(result.getStatusCode());
-                } else {
-                    LOGD(TAG, "stopApplication -> onResult Stopped application " + "successfully");
-                }
-            }
-        });
+                    @Override
+                    public void onResult(Status result) {
+                        if (!result.isSuccess()) {
+                            LOGD(TAG, "stopApplication -> onResult: stopping "
+                                    + "application failed");
+                            onApplicationStopFailed(result.getStatusCode());
+                        } else {
+                            LOGD(TAG,
+                                    "stopApplication -> onResult Stopped application "
+                                            + "successfully");
+                        }
+                    }
+                });
     }
 
     /*************************************************************/
     /***** Registering IBaseCastConsumer listeners ***************/
     /*************************************************************/
     /**
-     * Registers an {@link IBaseCastConsumer} interface with this class. Registered listeners will
-     * be notified of changes to a variety of lifecycle callbacks that the interface provides.
-     *
+     * Registers an {@link IBaseCastConsumer} interface with this class.
+     * Registered listeners will be notified of changes to a variety of
+     * lifecycle callbacks that the interface provides.
+     * 
      * @see BaseCastConsumerImpl
      * @param listener
      */
@@ -1119,7 +1212,9 @@ public void onCastAvailabilityChanged(boolean castPresent) {
         if (null != listener) {
             synchronized (mBaseCastConsumers) {
                 if (mBaseCastConsumers.add(listener)) {
-                    LOGD(TAG, "Successfully added the new BaseCastConsumer listener " + listener);
+                    LOGD(TAG,
+                            "Successfully added the new BaseCastConsumer listener "
+                                    + listener);
                 }
             }
         }
@@ -1127,27 +1222,32 @@ public void onCastAvailabilityChanged(boolean castPresent) {
 
     /**
      * Unregisters an {@link IBaseCastConsumer}.
-     *
+     * 
      * @param listener
      */
     public void removeBaseCastConsumer(IBaseCastConsumer listener) {
         if (null != listener) {
             synchronized (mBaseCastConsumers) {
                 if (mBaseCastConsumers.remove(listener)) {
-                    LOGD(TAG, "Successfully removed the existing BaseCastConsumer listener " +
-                            listener);
+                    LOGD(TAG,
+                            "Successfully removed the existing BaseCastConsumer listener "
+                                    + listener);
                 }
             }
         }
     }
 
     /**
-     * A simple method that throws an exception of there is no connectivity to the cast device.
-     *
-     * @throws TransientNetworkDisconnectionException If framework is still trying to recover
-     * @throws NoConnectionException                  If no connectivity to the device exists
+     * A simple method that throws an exception of there is no connectivity to
+     * the cast device.
+     * 
+     * @throws TransientNetworkDisconnectionException
+     *             If framework is still trying to recover
+     * @throws NoConnectionException
+     *             If no connectivity to the device exists
      */
-    public void checkConnectivity() throws TransientNetworkDisconnectionException,
+    public void checkConnectivity()
+            throws TransientNetworkDisconnectionException,
             NoConnectionException {
         if (!isConnected()) {
             if (mConnectionSuspened) {
@@ -1177,7 +1277,7 @@ public void onCastAvailabilityChanged(boolean castPresent) {
 
     /**
      * Returns the version of this library.
-     *
+     * 
      * @return
      */
     public final static String getCclVersion() {

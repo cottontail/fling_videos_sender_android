@@ -38,12 +38,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import tv.matchstick.fling.ApplicationMetadata;
-import tv.matchstick.fling.Fling;
-import tv.matchstick.fling.Fling.FlingOptions.Builder;
-import tv.matchstick.fling.FlingDevice;
-import tv.matchstick.fling.ResultCallback;
-import tv.matchstick.fling.Status;
+import tv.matchstick.flint.ApplicationMetadata;
+import tv.matchstick.flint.Flint;
+import tv.matchstick.flint.Flint.FlintOptions.Builder;
+import tv.matchstick.flint.FlintDevice;
+import tv.matchstick.flint.ResultCallback;
+import tv.matchstick.flint.Status;
 
 /**
  * A concrete subclass of {@link BaseCastManager} that is suitable for data-centric applications
@@ -76,7 +76,7 @@ import tv.matchstick.fling.Status;
  * library.
  */
 public class DataCastManager extends BaseCastManager
-        implements Fling.MessageReceivedCallback {
+        implements Flint.MessageReceivedCallback {
 
     private static final String TAG = LogUtils.makeLogTag(DataCastManager.class);
     private static DataCastManager sInstance;
@@ -184,7 +184,7 @@ public class DataCastManager extends BaseCastManager
             return false;
         }
         try {
-            Fling.FlingApi.setMessageReceivedCallbacks(mApiClient, namespace, this);
+            Flint.FlintApi.setMessageReceivedCallbacks(mApiClient, namespace, this);
             mNamespaceList.add(namespace);
             return true;
         } catch (IOException e) {
@@ -218,7 +218,7 @@ public class DataCastManager extends BaseCastManager
             return false;
         }
         try {
-            Fling.FlingApi.removeMessageReceivedCallbacks(mApiClient, namespace);
+            Flint.FlintApi.removeMessageReceivedCallbacks(mApiClient, namespace);
             mNamespaceList.remove(namespace);
             return true;
         } catch (IOException e) {
@@ -251,7 +251,7 @@ public class DataCastManager extends BaseCastManager
         if (TextUtils.isEmpty(namespace)) {
             throw new IllegalArgumentException("namespace cannot be empty");
         }
-        Fling.FlingApi.sendMessage(mApiClient, namespace, message).
+        Flint.FlintApi.sendMessage(mApiClient, namespace, message).
                 setResultCallback(new ResultCallback<Status>() {
 
                     @Override
@@ -273,17 +273,14 @@ public class DataCastManager extends BaseCastManager
     }
 
     @Override
-    protected Builder getCastOptionBuilder(FlingDevice device) {
+    protected Builder getCastOptionBuilder(FlintDevice device) {
 
-        Builder builder = Fling.FlingOptions.builder(
-                mSelectedCastDevice, new FlingListener());
-        if (isFeatureEnabled(FEATURE_DEBUGGING)) {
-            builder.setVerboseLoggingEnabled(true);
-        }
+        Builder builder = Flint.FlintOptions.builder(
+                mSelectedCastDevice, new FlintListener());
         return builder;
     }
 
-    class FlingListener extends Fling.Listener {
+    class FlintListener extends Flint.Listener {
 
         /*
          * (non-Javadoc)
@@ -388,9 +385,9 @@ public class DataCastManager extends BaseCastManager
     private void attachDataChannels() throws IllegalStateException, IOException,
             TransientNetworkDisconnectionException, NoConnectionException {
         checkConnectivity();
-        if (!mNamespaceList.isEmpty() && null != Fling.FlingApi) {
+        if (!mNamespaceList.isEmpty() && null != Flint.FlintApi) {
             for (String namespace : mNamespaceList) {
-                Fling.FlingApi.setMessageReceivedCallbacks(mApiClient, namespace, this);
+                Flint.FlintApi.setMessageReceivedCallbacks(mApiClient, namespace, this);
             }
         }
     }
@@ -402,10 +399,10 @@ public class DataCastManager extends BaseCastManager
      * possibly transient loss of network
      */
     private void detachDataChannels() {
-        if (!mNamespaceList.isEmpty() && null != Fling.FlingApi && null != mApiClient) {
+        if (!mNamespaceList.isEmpty() && null != Flint.FlintApi && null != mApiClient) {
             for (String namespace : mNamespaceList) {
                 try {
-                    Fling.FlingApi.removeMessageReceivedCallbacks(mApiClient, namespace);
+                    Flint.FlintApi.removeMessageReceivedCallbacks(mApiClient, namespace);
                 } catch (Exception e) {
                     LOGE(TAG, "Failed to add namespace: " + namespace, e);
                 }
@@ -450,9 +447,9 @@ public class DataCastManager extends BaseCastManager
             return;
         }
         try {
-            appStatus = Fling.FlingApi.getApplicationStatus(mApiClient);
+            appStatus = Flint.FlintApi.getApplicationStatus(mApiClient);
             LOGD(TAG, "onApplicationStatusChanged() reached: "
-                    + Fling.FlingApi.getApplicationStatus(mApiClient));
+                    + Flint.FlintApi.getApplicationStatus(mApiClient));
             synchronized (mDataConsumers) {
                 for (IDataCastConsumer consumer : mDataConsumers) {
                     try {
@@ -490,7 +487,7 @@ public class DataCastManager extends BaseCastManager
     /*************************************************************************/
 
     @Override
-    public void onMessageReceived(FlingDevice flingDevice, String namespace, String message) {
+    public void onMessageReceived(FlintDevice flingDevice, String namespace, String message) {
         synchronized (mDataConsumers) {
             for (IDataCastConsumer consumer : mDataConsumers) {
                 try {

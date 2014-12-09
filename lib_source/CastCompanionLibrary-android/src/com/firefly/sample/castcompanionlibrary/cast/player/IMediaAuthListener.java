@@ -18,7 +18,7 @@ package com.firefly.sample.castcompanionlibrary.cast.player;
 
 import org.json.JSONObject;
 
-import tv.matchstick.fling.MediaInfo;
+import tv.matchstick.flint.MediaInfo;
 
 /**
  * A public interface that provides callbacks for the {@link IMediaAuthService} to communicate with

@@ -16,9 +16,9 @@
 
 package com.firefly.sample.castcompanionlibrary.cast.callbacks;
 
-import tv.matchstick.fling.ApplicationMetadata;
-import tv.matchstick.fling.FlingDevice;
-import tv.matchstick.fling.Status;
+import tv.matchstick.flint.ApplicationMetadata;
+import tv.matchstick.flint.FlintDevice;
+import tv.matchstick.flint.Status;
 
 
 public interface IDataCastConsumer extends IBaseCastConsumer {
@@ -89,7 +89,7 @@ public interface IDataCastConsumer extends IBaseCastConsumer {
      * @param namespace
      * @param message
      */
-    public void onMessageReceived(FlingDevice flingDevice, String namespace, String message);
+    public void onMessageReceived(FlintDevice flingDevice, String namespace, String message);
 
     /**
      * Called when there is an error sending a message.
@@ -104,5 +104,5 @@ public interface IDataCastConsumer extends IBaseCastConsumer {
      * @param castDevice The castDevice from where the message originated.
      * @param namespace The associated namespace of the removed listener.
      */
-    public void onRemoved(FlingDevice flingDevice, String namespace);
+    public void onRemoved(FlintDevice flingDevice, String namespace);
 }

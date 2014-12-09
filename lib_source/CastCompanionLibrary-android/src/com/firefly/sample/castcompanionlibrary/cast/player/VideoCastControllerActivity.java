@@ -18,8 +18,8 @@ package com.firefly.sample.castcompanionlibrary.cast.player;
 
 import static com.firefly.sample.castcompanionlibrary.utils.LogUtils.LOGD;
 import static com.firefly.sample.castcompanionlibrary.utils.LogUtils.LOGE;
-import tv.matchstick.fling.MediaInfo;
-import tv.matchstick.fling.MediaStatus;
+import tv.matchstick.flint.MediaInfo;
+import tv.matchstick.flint.MediaStatus;
 
 import android.app.Activity;
 import android.graphics.Bitmap;

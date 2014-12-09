@@ -40,8 +40,8 @@ import com.firefly.sample.castcompanionlibrary.R;
 
 import java.net.URL;
 
-import tv.matchstick.fling.MediaInfo;
-import tv.matchstick.fling.MediaStatus;
+import tv.matchstick.flint.MediaInfo;
+import tv.matchstick.flint.MediaStatus;
 
 /**
  * A compound component that provides a superset of functionalities required for the global access

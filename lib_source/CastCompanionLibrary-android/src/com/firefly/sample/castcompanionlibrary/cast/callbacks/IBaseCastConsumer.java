@@ -16,7 +16,7 @@
 
 package com.firefly.sample.castcompanionlibrary.cast.callbacks;
 
-import tv.matchstick.fling.ConnectionResult;
+import tv.matchstick.flint.ConnectionResult;
 
 import com.firefly.sample.castcompanionlibrary.cast.exceptions.OnFailedListener;
 
