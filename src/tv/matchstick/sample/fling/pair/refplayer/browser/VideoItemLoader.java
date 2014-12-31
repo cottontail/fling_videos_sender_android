@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tv.matchstick.sample.fling.refplayer.browser;
+package tv.matchstick.sample.fling.pair.refplayer.browser;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;

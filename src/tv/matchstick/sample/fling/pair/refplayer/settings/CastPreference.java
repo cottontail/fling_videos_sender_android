@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package tv.matchstick.sample.fling.refplayer.settings;
+package tv.matchstick.sample.fling.pair.refplayer.settings;
 
-import tv.matchstick.sample.fling.refplayer.CastApplication;
-import tv.matchstick.sample.fling.refplayer.R;
-import tv.matchstick.sample.fling.refplayer.utils.Utils;
+import tv.matchstick.sample.fling.pair.refplayer.CastApplication;
+import tv.matchstick.sample.fling.pair.refplayer.utils.Utils;
+import tv.matchstick.sample.fling.pair.refplayer.R;
 
 import com.firefly.sample.castcompanionlibrary.cast.VideoCastManager;
 

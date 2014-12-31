@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tv.matchstick.sample.fling.refplayer.browser;
+package tv.matchstick.sample.fling.pair.refplayer.browser;
 
 import com.androidquery.AQuery;
 
@@ -30,7 +30,7 @@ import java.util.List;
 
 import tv.matchstick.flint.MediaInfo;
 import tv.matchstick.flint.MediaMetadata;
-import tv.matchstick.sample.fling.refplayer.R;
+import tv.matchstick.sample.fling.pair.refplayer.R;
 
 /**
  * An {@link ArrayAdapter} to populate the list of videos.

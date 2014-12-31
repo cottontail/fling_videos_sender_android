@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tv.matchstick.sample.fling.refplayer.browser;
+package tv.matchstick.sample.fling.pair.refplayer.browser;
 
 import com.firefly.sample.castcompanionlibrary.utils.Utils;
 
@@ -29,9 +29,9 @@ import android.widget.ListView;
 import java.util.List;
 
 import tv.matchstick.flint.MediaInfo;
-import tv.matchstick.sample.fling.refplayer.R;
-import tv.matchstick.sample.fling.refplayer.mediaplayer.LocalPlayerActivity;
-import tv.matchstick.sample.fling.refplayer.settings.CastPreference;
+import tv.matchstick.sample.fling.pair.refplayer.mediaplayer.LocalPlayerActivity;
+import tv.matchstick.sample.fling.pair.refplayer.settings.CastPreference;
+import tv.matchstick.sample.fling.pair.refplayer.R;
 
 public class VideoBrowserListFragment extends ListFragment implements
         LoaderManager.LoaderCallbacks<List<MediaInfo>> {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Fling Videos</string>
+    <string name="app_name">Pair Videos</string>
     <string name="action_settings">Settings</string>
     <string name="action_stop">Stop</string>
     <string name="cast_app_name">MatchStickFlingPlayer</string>

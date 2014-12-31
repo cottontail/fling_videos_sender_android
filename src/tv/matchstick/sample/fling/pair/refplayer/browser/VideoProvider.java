@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tv.matchstick.sample.fling.refplayer.browser;
+package tv.matchstick.sample.fling.pair.refplayer.browser;
 
 import android.content.Context;
 import android.net.Uri;
@@ -27,7 +27,7 @@ import org.json.JSONObject;
 import tv.matchstick.flint.MediaInfo;
 import tv.matchstick.flint.MediaMetadata;
 import tv.matchstick.flint.images.WebImage;
-import tv.matchstick.sample.fling.refplayer.settings.CastPreference;
+import tv.matchstick.sample.fling.pair.refplayer.settings.CastPreference;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;

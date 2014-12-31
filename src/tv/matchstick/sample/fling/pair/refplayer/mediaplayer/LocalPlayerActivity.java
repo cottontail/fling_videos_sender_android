@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tv.matchstick.sample.fling.refplayer.mediaplayer;
+package tv.matchstick.sample.fling.pair.refplayer.mediaplayer;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -58,10 +58,10 @@ import java.util.TimerTask;
 import tv.matchstick.flint.ApplicationMetadata;
 import tv.matchstick.flint.MediaInfo;
 import tv.matchstick.flint.MediaMetadata;
-import tv.matchstick.sample.fling.refplayer.CastApplication;
-import tv.matchstick.sample.fling.refplayer.R;
-import tv.matchstick.sample.fling.refplayer.settings.CastPreference;
-import tv.matchstick.sample.fling.refplayer.utils.Utils;
+import tv.matchstick.sample.fling.pair.refplayer.CastApplication;
+import tv.matchstick.sample.fling.pair.refplayer.settings.CastPreference;
+import tv.matchstick.sample.fling.pair.refplayer.utils.Utils;
+import tv.matchstick.sample.fling.pair.refplayer.R;
 
 public class LocalPlayerActivity extends ActionBarActivity {
 
@@ -286,9 +286,13 @@ public class LocalPlayerActivity extends ActionBarActivity {
                         break;
                     case REMOTE:
                         try {
+                            android.util.Log.d("XXXXXXXXXXX", "11111111111");
                             mCastManager.checkConnectivity();
+                            android.util.Log.d("XXXXXXXXXXX", "2222222222");
                             loadRemoteMedia(0, true);
+                            android.util.Log.d("XXXXXXXXXXX", "333333333");
                             finish();
+                            android.util.Log.d("XXXXXXXXXXX", "4444444444");
                         } catch (Exception e) {
                             Utils.handleException(LocalPlayerActivity.this, e);
                             return;

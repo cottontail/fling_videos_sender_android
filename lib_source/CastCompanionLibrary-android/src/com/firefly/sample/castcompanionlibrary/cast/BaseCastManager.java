@@ -200,13 +200,7 @@ public abstract class BaseCastManager implements DeviceSelectionListener,
     }
 
     protected String getAppUrl() {
-        // if (mSelectedCastDevice != null &&
-        // mApplicationId.startsWith("app:?")) {
-        // if ("Chromecast".equals(mSelectedCastDevice.getModelName())) {
-        // return FlintMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID;
-        // }
-        // }
-        return "http://openflint.github.io/flint-player/player.html";
+        return "http://castapp.infthink.com/droidream/samples/flint-player/player.html";
     }
 
     public void onWifiConnectivityChanged(boolean connected) {

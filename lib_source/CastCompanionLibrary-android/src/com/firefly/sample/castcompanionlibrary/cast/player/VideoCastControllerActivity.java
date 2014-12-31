@@ -87,6 +87,7 @@ public class VideoCastControllerActivity extends ActionBarActivity implements IV
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        android.util.Log.d("XXXXXXXXXXXXX", "555555555555");
         setContentView(R.layout.cast_activity);
         loadAndSetupViews();
         mVolumeIncrement = Utils.getFloatFromPreference(
@@ -102,7 +103,11 @@ public class VideoCastControllerActivity extends ActionBarActivity implements IV
 
         setupActionBar();
         Bundle extras = getIntent().getExtras();
+        android.util.Log.d("XXXXXXXXXXXXX", "66666666666");
+
         if (null == extras) {
+            android.util.Log.d("XXXXXXXXXXXXX", "77777777777");
+
             finish();
             return;
         }
@@ -120,6 +125,8 @@ public class VideoCastControllerActivity extends ActionBarActivity implements IV
             mListener = mediaAuthFragment;
             mListener.onConfigurationChanged();
         }
+        android.util.Log.d("XXXXXXXXXXXXX", "888888888888");
+
     }
 
     @Override
@@ -346,7 +353,6 @@ public class VideoCastControllerActivity extends ActionBarActivity implements IV
     @Override
     public void setLine1(String text) {
         mLine1.setText(text);
-
     }
 
     @Override
@@ -377,6 +383,7 @@ public class VideoCastControllerActivity extends ActionBarActivity implements IV
 
     @Override
     public void closeActivity() {
+        android.util.Log.d("XXXXXXXXXXXXX", "9999999999999");
         finish();
     }
 

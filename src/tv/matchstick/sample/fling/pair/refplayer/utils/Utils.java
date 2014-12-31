@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tv.matchstick.sample.fling.refplayer.utils;
+package tv.matchstick.sample.fling.pair.refplayer.utils;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -27,7 +27,7 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
-import tv.matchstick.sample.fling.refplayer.R;
+import tv.matchstick.sample.fling.pair.refplayer.R;
 
 import com.firefly.sample.castcompanionlibrary.cast.exceptions.CastException;
 import com.firefly.sample.castcompanionlibrary.cast.exceptions.NoConnectionException;
@@ -152,7 +152,7 @@ public class Utils {
             resourceId = R.string.failed_to_perform_action;
         }
         if (resourceId > 0) {
-            tv.matchstick.sample.fling.refplayer.utils.Utils.showOopsDialog(context, resourceId);
+            tv.matchstick.sample.fling.pair.refplayer.utils.Utils.showOopsDialog(context, resourceId);
         }
     }
 

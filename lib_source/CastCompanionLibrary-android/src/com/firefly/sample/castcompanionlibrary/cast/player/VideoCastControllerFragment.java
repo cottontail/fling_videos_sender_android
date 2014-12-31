@@ -211,11 +211,13 @@ public class VideoCastControllerFragment extends Fragment implements OnVideoCast
 
         @Override
         public void onDisconnected() {
+            android.util.Log.d("XXXXXXXXXX", "aaaaaaaaaaaaa");
             mCastController.closeActivity();
         }
 
         @Override
         public void onApplicationDisconnected(int errorCode) {
+            android.util.Log.d("XXXXXXXXXX", "bbbbbbbbbbb");
             mCastController.closeActivity();
         }
 
@@ -305,6 +307,7 @@ public class VideoCastControllerFragment extends Fragment implements OnVideoCast
             }
         } catch (Exception e) {
             LOGE(TAG, "Failed to get playback and media information", e);
+            android.util.Log.d("XXXXXXXXXX", "cccccccccccc");
             mCastController.closeActivity();
         }
         updateMetadata();
@@ -403,6 +406,7 @@ public class VideoCastControllerFragment extends Fragment implements OnVideoCast
                 switch (mCastManager.getIdleReason()) {
                     case MediaStatus.IDLE_REASON_FINISHED:
                         if (!mIsFresh) {
+                            android.util.Log.d("XXXXXXXXXX", "ddddddddddd");
                             mCastController.closeActivity();
                         }
                         break;
@@ -447,6 +451,7 @@ public class VideoCastControllerFragment extends Fragment implements OnVideoCast
                     && mCastManager.getIdleReason() == MediaStatus.IDLE_REASON_FINISHED
                     && !mIsFresh);
             if (shouldFinish) {
+                android.util.Log.d("XXXXXXXXXX", "eeeeeeeeeee");
                 mCastController.closeActivity();
             }
             mCastManager.addVideoCastConsumer(mCastConsumer);
@@ -590,6 +595,7 @@ public class VideoCastControllerFragment extends Fragment implements OnVideoCast
             restartTrickplayTimer();
         } catch (Exception e) {
             LOGE(TAG, "Failed to complete seek", e);
+            android.util.Log.d("XXXXXXXXXX", "fffffffffffff");
             mCastController.closeActivity();
         }
     }

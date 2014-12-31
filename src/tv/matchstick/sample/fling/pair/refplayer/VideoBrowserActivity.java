@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package tv.matchstick.sample.fling.refplayer;
+package tv.matchstick.sample.fling.pair.refplayer;
 
-import tv.matchstick.sample.fling.refplayer.settings.CastPreference;
+import tv.matchstick.sample.fling.pair.refplayer.settings.CastPreference;
+import tv.matchstick.sample.fling.pair.refplayer.R;
 
 import com.firefly.sample.castcompanionlibrary.cast.VideoCastManager;
-import com.firefly.sample.castcompanionlibrary.cast.VideoCastManager.VolumeType;
 import com.firefly.sample.castcompanionlibrary.cast.callbacks.IVideoCastConsumer;
 import com.firefly.sample.castcompanionlibrary.cast.callbacks.VideoCastConsumerImpl;
-import com.firefly.sample.castcompanionlibrary.cast.exceptions.CastException;
-import com.firefly.sample.castcompanionlibrary.cast.exceptions.NoConnectionException;
-import com.firefly.sample.castcompanionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
 import com.firefly.sample.castcompanionlibrary.widgets.MiniController;
 
 import android.content.Intent;
@@ -73,13 +70,13 @@ public class VideoBrowserActivity extends ActionBarActivity {
             @Override
             public void onConnectionSuspended(int cause) {
                 Log.d(TAG, "onConnectionSuspended() was called with cause: " + cause);
-                tv.matchstick.sample.fling.refplayer.utils.Utils.
+                tv.matchstick.sample.fling.pair.refplayer.utils.Utils.
                         showToast(VideoBrowserActivity.this, R.string.connection_temp_lost);
             }
 
             @Override
             public void onConnectivityRecovered() {
-                tv.matchstick.sample.fling.refplayer.utils.Utils.
+                tv.matchstick.sample.fling.pair.refplayer.utils.Utils.
                         showToast(VideoBrowserActivity.this, R.string.connection_recovered);
             }
 
@@ -163,7 +160,7 @@ public class VideoBrowserActivity extends ActionBarActivity {
             mCastManager.incrementVolume(volumeIncrement);
         } catch (Exception e) {
             Log.e(TAG, "onVolumeChange() Failed to change volume", e);
-            tv.matchstick.sample.fling.refplayer.utils.Utils.handleException(this, e);
+            tv.matchstick.sample.fling.pair.refplayer.utils.Utils.handleException(this, e);
         }
     }
 

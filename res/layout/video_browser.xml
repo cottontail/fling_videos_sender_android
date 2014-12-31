@@ -9,7 +9,7 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/miniController1"
         android:layout_marginBottom="-5dp"
-        class="tv.matchstick.sample.fling.refplayer.browser.VideoBrowserListFragment" />
+        class="tv.matchstick.sample.fling.pair.refplayer.browser.VideoBrowserListFragment" />
 
     <com.firefly.sample.castcompanionlibrary.widgets.MiniController
         android:id="@+id/miniController1"
