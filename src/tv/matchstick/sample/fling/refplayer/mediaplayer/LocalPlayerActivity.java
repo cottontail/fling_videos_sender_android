@@ -80,7 +80,7 @@ public class LocalPlayerActivity extends ActionBarActivity {
     private VideoCastManager mCastManager;
     private Timer mSeekbarTimer;
     private Timer mControlersTimer;
-    private PlaybackLocation mLocation;
+    private PlaybackLocation mLocation = PlaybackLocation.LOCAL;
     private PlaybackState mPlaybackState;
     private final Handler mHandler = new Handler();
     private Point mDisplaySize;
@@ -99,8 +99,7 @@ public class LocalPlayerActivity extends ActionBarActivity {
      * indicates whether we are doing a local or a remote playback
      */
     public static enum PlaybackLocation {
-        LOCAL,
-        REMOTE;
+        LOCAL, REMOTE;
     }
 
     /*
@@ -129,7 +128,9 @@ public class LocalPlayerActivity extends ActionBarActivity {
             mShouldStartPlayback = b.getBoolean("shouldStart");
             int startPosition = b.getInt("startPosition", 0);
             mVideoView.setVideoURI(Uri.parse(mSelectedMedia.getContentId()));
-            Log.d(TAG, "Setting url of the VideoView to: " + mSelectedMedia.getContentId());
+            Log.d(TAG,
+                    "Setting url of the VideoView to: "
+                            + mSelectedMedia.getContentId());
             if (mShouldStartPlayback) {
                 // this will be the case only if we are coming from the
                 // CastControllerActivity by disconnecting from a device
@@ -183,7 +184,9 @@ public class LocalPlayerActivity extends ActionBarActivity {
 
             @Override
             public void onApplicationDisconnected(int errorCode) {
-                Log.d(TAG, "onApplicationDisconnected() is reached with errorCode: " + errorCode);
+                Log.d(TAG,
+                        "onApplicationDisconnected() is reached with errorCode: "
+                                + errorCode);
                 updatePlaybackLocation(PlaybackLocation.LOCAL);
             }
 
@@ -197,7 +200,8 @@ public class LocalPlayerActivity extends ActionBarActivity {
             @Override
             public void onRemoteMediaPlayerMetadataUpdated() {
                 try {
-                    mRemoteMediaInformation = mCastManager.getRemoteMediaInformation();
+                    mRemoteMediaInformation = mCastManager
+                            .getRemoteMediaInformation();
                 } catch (Exception e) {
                     // silent
                 }
@@ -231,21 +235,21 @@ public class LocalPlayerActivity extends ActionBarActivity {
     private void updatePlaybackLocation(PlaybackLocation location) {
         this.mLocation = location;
         if (location == PlaybackLocation.LOCAL) {
-            if (mPlaybackState == PlaybackState.PLAYING ||
-                    mPlaybackState == PlaybackState.BUFFERING) {
+            if (mPlaybackState == PlaybackState.PLAYING
+                    || mPlaybackState == PlaybackState.BUFFERING) {
                 setCoverArtStatus(null);
                 startControllersTimer();
             } else {
                 stopControllersTimer();
-                setCoverArtStatus(com.firefly.sample.castcompanionlibrary.utils.Utils.
-                        getImageUrl(mSelectedMedia, 0));
+                setCoverArtStatus(com.firefly.sample.castcompanionlibrary.utils.Utils
+                        .getImageUrl(mSelectedMedia, 0));
             }
 
             getSupportActionBar().setTitle("");
         } else {
             stopControllersTimer();
-            setCoverArtStatus(com.firefly.sample.castcompanionlibrary.utils.Utils.
-                    getImageUrl(mSelectedMedia, 0));
+            setCoverArtStatus(com.firefly.sample.castcompanionlibrary.utils.Utils
+                    .getImageUrl(mSelectedMedia, 0));
             updateControlersVisibility(true);
         }
     }
@@ -253,21 +257,21 @@ public class LocalPlayerActivity extends ActionBarActivity {
     private void play(int position) {
         startControllersTimer();
         switch (mLocation) {
-            case LOCAL:
-                mVideoView.seekTo(position);
-                mVideoView.start();
-                break;
-            case REMOTE:
-                mPlaybackState = PlaybackState.BUFFERING;
-                updatePlayButton(mPlaybackState);
-                try {
-                    mCastManager.play(position);
-                } catch (Exception e) {
-                    Utils.handleException(this, e);
-                }
-                break;
-            default:
-                break;
+        case LOCAL:
+            mVideoView.seekTo(position);
+            mVideoView.start();
+            break;
+        case REMOTE:
+            mPlaybackState = PlaybackState.BUFFERING;
+            updatePlayButton(mPlaybackState);
+            try {
+                mCastManager.play(position);
+            } catch (Exception e) {
+                Utils.handleException(this, e);
+            }
+            break;
+        default:
+            break;
         }
         restartTrickplayTimer();
     }
@@ -275,50 +279,60 @@ public class LocalPlayerActivity extends ActionBarActivity {
     private void togglePlayback() {
         stopControllersTimer();
         switch (mPlaybackState) {
-            case PAUSED:
-                switch (mLocation) {
-                    case LOCAL:
-                        mVideoView.start();
-                        mPlaybackState = PlaybackState.PLAYING;
-                        startControllersTimer();
-                        restartTrickplayTimer();
-                        updatePlaybackLocation(PlaybackLocation.LOCAL);
-                        break;
-                    case REMOTE:
-                        try {
-                            mCastManager.checkConnectivity();
-                            loadRemoteMedia(0, true);
-                            finish();
-                        } catch (Exception e) {
-                            Utils.handleException(LocalPlayerActivity.this, e);
-                            return;
-                        }
-                        break;
-                    default:
-                        break;
+        case PAUSED:
+            switch (mLocation) {
+            case LOCAL:
+                playLocalVideo();
+                break;
+            case REMOTE:
+                try {
+                    mCastManager.checkConnectivity();
+                    if (mCastManager.getRemoteMediaPlayer() != null) {
+                        loadRemoteMedia(0, true);
+                        finish();
+                    } else {
+                        playLocalVideo();
+                    }
+                } catch (Exception e) {
+                    Utils.handleException(LocalPlayerActivity.this, e);
+                    return;
                 }
-                break;
 
-            case PLAYING:
-                mPlaybackState = PlaybackState.PAUSED;
-                mVideoView.pause();
                 break;
-
-            case IDLE:
-                mVideoView.seekTo(0);
-                mVideoView.start();
-                mPlaybackState = PlaybackState.PLAYING;
-                restartTrickplayTimer();
-                break;
-
             default:
                 break;
+            }
+            break;
+
+        case PLAYING:
+            mPlaybackState = PlaybackState.PAUSED;
+            mVideoView.pause();
+            break;
+
+        case IDLE:
+            mVideoView.seekTo(0);
+            mVideoView.start();
+            mPlaybackState = PlaybackState.PLAYING;
+            restartTrickplayTimer();
+            break;
+
+        default:
+            break;
         }
         updatePlayButton(mPlaybackState);
     }
+    
+    private void playLocalVideo() {
+        mVideoView.start();
+        mPlaybackState = PlaybackState.PLAYING;
+        startControllersTimer();
+        restartTrickplayTimer();
+        updatePlaybackLocation(PlaybackLocation.LOCAL);
+    }
 
     private void loadRemoteMedia(int position, boolean autoPlay) {
-        mCastManager.startCastControllerActivity(this, mSelectedMedia, position, autoPlay);
+        mCastManager.startCastControllerActivity(this, mSelectedMedia,
+                position, autoPlay);
     }
 
     private void setCoverArtStatus(String url) {
@@ -471,8 +485,9 @@ public class LocalPlayerActivity extends ActionBarActivity {
 
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
-                Log.e(TAG, "OnErrorListener.onError(): VideoView encountered an " +
-                        "error, what: " + what + ", extra: " + extra);
+                Log.e(TAG,
+                        "OnErrorListener.onError(): VideoView encountered an "
+                                + "error, what: " + what + ", extra: " + extra);
                 String msg = "";
                 if (extra == MediaPlayer.MEDIA_ERROR_TIMED_OUT) {
                     msg = getString(R.string.video_error_media_load_timeout);
@@ -545,8 +560,9 @@ public class LocalPlayerActivity extends ActionBarActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress,
                     boolean fromUser) {
-                mStartText.setText(com.firefly.sample.castcompanionlibrary.utils.Utils
-                        .formatMillis(progress));
+                mStartText
+                        .setText(com.firefly.sample.castcompanionlibrary.utils.Utils
+                                .formatMillis(progress));
             }
         });
 
@@ -589,30 +605,31 @@ public class LocalPlayerActivity extends ActionBarActivity {
         mSeekbar.setMax(duration);
         mStartText.setText(com.firefly.sample.castcompanionlibrary.utils.Utils
                 .formatMillis(position));
-        mEndText.setText(com.firefly.sample.castcompanionlibrary.utils.Utils.formatMillis(duration));
+        mEndText.setText(com.firefly.sample.castcompanionlibrary.utils.Utils
+                .formatMillis(duration));
     }
 
     private void updatePlayButton(PlaybackState state) {
         switch (state) {
-            case PLAYING:
-                mLoading.setVisibility(View.INVISIBLE);
-                mPlayPause.setVisibility(View.VISIBLE);
-                mPlayPause.setImageDrawable(
-                        getResources().getDrawable(R.drawable.ic_av_pause_dark));
-                break;
-            case PAUSED:
-            case IDLE:
-                mLoading.setVisibility(View.INVISIBLE);
-                mPlayPause.setVisibility(View.VISIBLE);
-                mPlayPause.setImageDrawable(
-                        getResources().getDrawable(R.drawable.ic_av_play_dark));
-                break;
-            case BUFFERING:
-                mPlayPause.setVisibility(View.INVISIBLE);
-                mLoading.setVisibility(View.VISIBLE);
-                break;
-            default:
-                break;
+        case PLAYING:
+            mLoading.setVisibility(View.INVISIBLE);
+            mPlayPause.setVisibility(View.VISIBLE);
+            mPlayPause.setImageDrawable(getResources().getDrawable(
+                    R.drawable.ic_av_pause_dark));
+            break;
+        case PAUSED:
+        case IDLE:
+            mLoading.setVisibility(View.INVISIBLE);
+            mPlayPause.setVisibility(View.VISIBLE);
+            mPlayPause.setImageDrawable(getResources().getDrawable(
+                    R.drawable.ic_av_play_dark));
+            break;
+        case BUFFERING:
+            mPlayPause.setVisibility(View.INVISIBLE);
+            mLoading.setVisibility(View.VISIBLE);
+            break;
+        default:
+            break;
         }
     }
 
@@ -621,25 +638,30 @@ public class LocalPlayerActivity extends ActionBarActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+            getWindow().clearFlags(
+                    WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                     WindowManager.LayoutParams.FLAG_FULLSCREEN);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+                getWindow().getDecorView().setSystemUiVisibility(
+                        View.SYSTEM_UI_FLAG_LOW_PROFILE);
             }
             updateMetadata(false);
-            mContainer.setBackgroundColor(getResources().getColor(R.color.black));
+            mContainer.setBackgroundColor(getResources()
+                    .getColor(R.color.black));
 
         } else {
-            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN,
+            getWindow().setFlags(
+                    WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN,
                     WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-            getWindow().clearFlags(
-                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+                getWindow().getDecorView().setSystemUiVisibility(
+                        View.SYSTEM_UI_FLAG_VISIBLE);
             }
             updateMetadata(true);
-            mContainer.setBackgroundColor(getResources().getColor(R.color.white));
+            mContainer.setBackgroundColor(getResources()
+                    .getColor(R.color.white));
 
         }
     }
@@ -650,9 +672,9 @@ public class LocalPlayerActivity extends ActionBarActivity {
             mTitleView.setVisibility(View.GONE);
             mAuthorView.setVisibility(View.GONE);
             mDisplaySize = Utils.getDisplaySize(this);
-            RelativeLayout.LayoutParams lp = new
-                    RelativeLayout.LayoutParams(mDisplaySize.x,
-                            mDisplaySize.y + getSupportActionBar().getHeight());
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                    mDisplaySize.x, mDisplaySize.y
+                            + getSupportActionBar().getHeight());
             lp.addRule(RelativeLayout.CENTER_IN_PARENT);
             mVideoView.setLayoutParams(lp);
             mVideoView.invalidate();
@@ -665,9 +687,8 @@ public class LocalPlayerActivity extends ActionBarActivity {
             mTitleView.setVisibility(View.VISIBLE);
             mAuthorView.setVisibility(View.VISIBLE);
             mDisplaySize = Utils.getDisplaySize(this);
-            RelativeLayout.LayoutParams lp = new
-                    RelativeLayout.LayoutParams(mDisplaySize.x,
-                            (int) (mDisplaySize.x * mAspectRatio));
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                    mDisplaySize.x, (int) (mDisplaySize.x * mAspectRatio));
             lp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
             mVideoView.setLayoutParams(lp);
             mVideoView.invalidate();
@@ -685,13 +706,14 @@ public class LocalPlayerActivity extends ActionBarActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                Intent i = new Intent(LocalPlayerActivity.this, CastPreference.class);
-                startActivity(i);
-                break;
-            case R.id.action_stop:
-                mCastManager.disconnect();
-                break;
+        case R.id.action_settings:
+            Intent i = new Intent(LocalPlayerActivity.this,
+                    CastPreference.class);
+            startActivity(i);
+            break;
+        case R.id.action_stop:
+            mCastManager.disconnect();
+            break;
 
         }
         return true;
@@ -703,7 +725,8 @@ public class LocalPlayerActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(false);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setBackgroundDrawable(
-                getResources().getDrawable(R.drawable.ab_transparent_democastoverlay));
+                getResources().getDrawable(
+                        R.drawable.ab_transparent_democastoverlay));
     }
 
     private void loadViews() {
