@@ -1575,9 +1575,9 @@ public class VideoCastManager extends BaseCastManager
                 LOGD(TAG, "onRemoteMediaPlayerStatusUpdated(): Player status = unknown");
                 makeUiHidden = true;
             }
-            if (makeUiHidden) {
-                stopNotificationService();
-            }
+//            if (makeUiHidden) {
+//                stopNotificationService();
+//            }
             updateMiniControllersVisibility(!makeUiHidden);
             updateMiniControllers();
             synchronized (mVideoConsumers) {
