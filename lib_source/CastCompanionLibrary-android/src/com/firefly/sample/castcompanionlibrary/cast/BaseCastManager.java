@@ -206,7 +206,7 @@ public abstract class BaseCastManager implements DeviceSelectionListener,
         // return FlintMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID;
         // }
         // }
-        return "http://openflint.github.io/flint-player/player.html";
+        return "http://shawnbow.github.io/flint-player/player.html";
     }
 
     public void onWifiConnectivityChanged(boolean connected) {
