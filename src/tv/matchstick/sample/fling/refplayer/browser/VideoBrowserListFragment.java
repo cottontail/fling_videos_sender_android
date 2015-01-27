@@ -45,7 +45,7 @@ public class VideoBrowserListFragment extends ListFragment implements
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        sCatalogUrl = CastPreference.getServerAddress(getActivity()) + "vlist.json";
+        sCatalogUrl = CastPreference.getServerAddress(getActivity()) + "vlist-partner-customized.json";
         getListView().setFastScrollEnabled(true);
         mAdapter = new VideoListAdapter(getActivity());
         setEmptyText(getString(R.string.no_video_found));
